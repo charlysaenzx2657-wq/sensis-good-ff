@@ -1,0 +1,25 @@
+{
+  "name": "SENSIS GOOD FF",
+  "short_name": "SENSIS FF",
+  "description": "Generador de sensibilidades para Free Fire",
+  "start_url": "/sensis-good-ff/",
+  "scope": "/sensis-good-ff/",
+  "display": "standalone",
+  "background_color": "#03070D",
+  "theme_color": "#03070D",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
