@@ -273,12 +273,45 @@
     .sj-tag-high{background:rgba(255,216,74,0.12);color:#FFD84A;border:1px solid rgba(255,216,74,0.3);}
     .sj-divider{height:1px;background:rgba(56,190,255,0.08);margin:6px 0;}
 
+
+    /* BANNER ACTUALIZACIÓN */
+    #updateBanner{
+      display:none;
+      position:fixed;
+      top:0;left:0;right:0;
+      z-index:9999;
+      background:linear-gradient(90deg,#0A84FF,#38BEFF);
+      color:#fff;
+      font-family:'Nunito',sans-serif;
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:1.5px;
+      text-align:center;
+      padding:12px 16px;
+      box-shadow:0 4px 20px rgba(10,132,255,0.5);
+      cursor:pointer;
+      animation:fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    #updateBanner span{
+      display:block;
+      font-size:10px;
+      font-weight:600;
+      letter-spacing:2px;
+      opacity:0.85;
+      margin-top:2px;
+    }
+
     .scanline{display:none;}
 
     @media(max-width:540px){.panel{margin:22px 12px;padding:30px 18px;}.logo{font-size:20px;letter-spacing:2px;}}
   </style>
 </head>
 <body>
+
+<div id="updateBanner" onclick="aplicarActualizacion()">
+  🔄 Nueva versión disponible — Toca aquí para actualizar
+  <span>↕ O desliza hacia abajo para recargar</span>
+</div>
 
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
@@ -350,7 +383,7 @@
         <option>SENSI PREMIUM</option><option>SENSI XIT</option><option>Sensibilidad VIP</option><option>Teléfono Modificado ☠️</option>
       </select>
     </div>
-    <div class="field"><label>Modelo del dispositivo</label><input type="text" id="modelo" placeholder="Ej: Galaxy A54"/></div>
+    <div class="field" id="modeloField"><label>Modelo del dispositivo</label><input type="text" id="modelo" placeholder="Ej: Galaxy A54"/></div>
     <div class="field-check" id="dpiCheckbox"><input type="checkbox" id="usarDpi"><span>Usar DPI personalizado</span></div>
     <button class="btn" onclick="generarSensi()">⚡ Generar Sensibilidad</button>
     <div id="result" style="display:none;">
@@ -986,19 +1019,79 @@ function generarSensi(){
 
 // ── RESTO DE FUNCIONES ────────────────────────────────────
 function mostrarAyudaLogin(){alert("✅ Ingresa el usuario y contraseña que te dio el dueño de SENSIS GOOD FF.");}
-function verificarMarca(){const m=document.getElementById("marca").value;document.getElementById("dpiCheckbox").style.display=(m==="iPhone")?"none":"flex";}
-function copiarTexto(){
-  const t=document.getElementById("sensiOutput").innerText;
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>alert("Sensibilidad copiada ✅")).catch(()=>copiarFallback());}
-  else copiarFallback();
+function verificarMarca(){
+  const m=document.getElementById("marca").value;
+  const vipMarcas=["SENSI PREMIUM","SENSI XIT","Sensibilidad VIP","Teléfono Modificado ☠️"];
+  const isVip=vipMarcas.includes(m);
+  const isIphone=(m==="iPhone");
+  // Ocultar modelo en marcas VIP
+  document.getElementById("modeloField").style.display=isVip?"none":"block";
+  // Si es VIP limpiar modelo y poner valor especial
+  if(isVip){
+    document.getElementById("modelo").value=m;
+  } else {
+    if(document.getElementById("modelo").value===document.getElementById("modelo").dataset.prev||""){
+      document.getElementById("modelo").value="";
+    }
+  }
+  // Ocultar DPI en iPhone o VIP
+  document.getElementById("dpiCheckbox").style.display=(isIphone||isVip)?"none":"flex";
 }
-function copiarFallback(){
+function copiarTexto(){
+  // Extraer datos del resultado para formatear bonito
+  const out = document.getElementById("sensiOutput");
+  const rows = out.querySelectorAll(".sensi-row");
+  const devName = out.querySelector(".dev-name");
+  const devModel = out.querySelector(".dev-model");
+
+  const marca  = devName  ? devName.innerText.replace("📱","").trim()  : "";
+  const modelo = devModel ? devModel.innerText.trim() : "";
+
+  // Construir lineas de sensibilidad
+  let lineas = [];
+  rows.forEach(function(row){
+    const lbl = row.querySelector(".sensi-label");
+    const val = row.querySelector(".sensi-val");
+    if(lbl && val){
+      // Limpiar label (quitar badge de ESTABLE/RAPIDO/CONTROL)
+      let lblTxt = lbl.innerText.replace(/ESTABLE|RÁPIDO|CONTROL/g,"").trim();
+      let valTxt = val.innerText.trim();
+      lineas.push(lblTxt + ": " + valTxt);
+    }
+  });
+
+  // Separar DPI si existe
+  let dpiLinea = "";
+  lineas = lineas.filter(function(l){
+    if(l.startsWith("🔵 DPI:")){
+      dpiLinea = "DPI: " + l.replace("🔵 DPI:","").trim();
+      return false;
+    }
+    return true;
+  });
+
+  // Construir texto formateado
+  const sep = "=======================";
+  let txt = sep + "\n";
+  txt += " |📱 MARCA: " + marca + "\n";
+  if(modelo && modelo !== marca) txt += " |📱 MODELO: " + modelo + "\n";
+  txt += sep + "\n";
+  lineas.forEach(function(l){ txt += l + "\n"; });
+  if(dpiLinea) txt += dpiLinea + "\n";
+  txt += "\n⚡ SENSIS GOOD FF — OPTIMIZADO PARA " + marca.toUpperCase();
+
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>alert("Sensibilidad copiada ✅")).catch(()=>_copiarFallbackTxt(txt));
+  } else {
+    _copiarFallbackTxt(txt);
+  }
+}
+function _copiarFallbackTxt(txt){
   try{
-    const el=document.getElementById("sensiOutput");
-    const r=document.createRange();r.selectNodeContents(el);
-    const s=window.getSelection();s.removeAllRanges();s.addRange(r);
+    const t=document.createElement("textarea");t.value=txt;
+    document.body.appendChild(t);t.select();
     document.execCommand('copy')?alert("✅ Copiado"):alert("📋 Copia manualmente");
-    setTimeout(()=>s.removeAllRanges(),1000);
+    document.body.removeChild(t);
   }catch(e){alert("❌ Error al copiar.");}
 }
 function toggleMenu(){document.getElementById("menuOptions").classList.toggle("is-open");}
@@ -1038,46 +1131,6 @@ function copiarHudFallback(c){
 
 // Base de datos completa marca → modelos [{m, res, inch, hz}]
 const DB_DPI = {
-"iPhone":[
-  {m:"iPhone 3G",        res:"320x480",   inch:3.5,  hz:60},
-  {m:"iPhone 4",         res:"640x960",   inch:3.5,  hz:60},
-  {m:"iPhone 5",         res:"640x1136",  inch:4.0,  hz:60},
-  {m:"iPhone 6",         res:"750x1334",  inch:4.7,  hz:60},
-  {m:"iPhone 6 Plus",    res:"1080x1920", inch:5.5,  hz:60},
-  {m:"iPhone 7",         res:"750x1334",  inch:4.7,  hz:60},
-  {m:"iPhone 7 Plus",    res:"1080x1920", inch:5.5,  hz:60},
-  {m:"iPhone 8",         res:"750x1334",  inch:4.7,  hz:60},
-  {m:"iPhone 8 Plus",    res:"1080x1920", inch:5.5,  hz:60},
-  {m:"iPhone X",         res:"1125x2436", inch:5.8,  hz:60},
-  {m:"iPhone XR",        res:"828x1792",  inch:6.1,  hz:60},
-  {m:"iPhone XS",        res:"1125x2436", inch:5.8,  hz:60},
-  {m:"iPhone XS Max",    res:"1242x2688", inch:6.5,  hz:60},
-  {m:"iPhone 11",        res:"828x1792",  inch:6.1,  hz:60},
-  {m:"iPhone 11 Pro",    res:"1125x2436", inch:5.8,  hz:60},
-  {m:"iPhone 11 Pro Max",res:"1242x2688", inch:6.5,  hz:60},
-  {m:"iPhone 12",        res:"1170x2532", inch:6.1,  hz:60},
-  {m:"iPhone 12 mini",   res:"1080x2340", inch:5.4,  hz:60},
-  {m:"iPhone 12 Pro",    res:"1170x2532", inch:6.1,  hz:60},
-  {m:"iPhone 12 Pro Max",res:"1284x2778", inch:6.7,  hz:60},
-  {m:"iPhone 13",        res:"1170x2532", inch:6.1,  hz:60},
-  {m:"iPhone 13 mini",   res:"1080x2340", inch:5.4,  hz:60},
-  {m:"iPhone 13 Pro",    res:"1170x2532", inch:6.1,  hz:120},
-  {m:"iPhone 13 Pro Max",res:"1284x2778", inch:6.7,  hz:120},
-  {m:"iPhone 14",        res:"1170x2532", inch:6.1,  hz:60},
-  {m:"iPhone 14 Plus",   res:"1284x2778", inch:6.7,  hz:60},
-  {m:"iPhone 14 Pro",    res:"1179x2556", inch:6.1,  hz:120},
-  {m:"iPhone 14 Pro Max",res:"1290x2796", inch:6.7,  hz:120},
-  {m:"iPhone 15",        res:"1179x2556", inch:6.1,  hz:60},
-  {m:"iPhone 15 Plus",   res:"1290x2796", inch:6.7,  hz:60},
-  {m:"iPhone 15 Pro",    res:"1179x2556", inch:6.1,  hz:120},
-  {m:"iPhone 15 Pro Max",res:"1290x2796", inch:6.7,  hz:120},
-  {m:"iPhone 16",        res:"1179x2556", inch:6.1,  hz:60},
-  {m:"iPhone 16 Plus",   res:"1290x2796", inch:6.7,  hz:60},
-  {m:"iPhone 16 Pro",    res:"1206x2622", inch:6.3,  hz:120},
-  {m:"iPhone 16 Pro Max",res:"1320x2868", inch:6.9,  hz:120},
-  {m:"iPhone SE 2",      res:"750x1334",  inch:4.7,  hz:60},
-  {m:"iPhone SE 3",      res:"750x1334",  inch:4.7,  hz:60},
-],
 "Samsung":[
   {m:"Galaxy S3",           res:"720x1280",  inch:4.8,  hz:60},
   {m:"Galaxy S4",           res:"1080x1920", inch:5.0,  hz:60},
@@ -1923,8 +1976,33 @@ function _inyectarManifest(){
 
 function _registrarSW(){
   if(!("serviceWorker" in navigator)) return;
-  // sw.js es un archivo real en el repo
-  navigator.serviceWorker.register("sw.js").catch(()=>{});
+  // Registrar con version para forzar actualizacion automatica
+  navigator.serviceWorker.register("sw.js?v=3.2").then(function(reg){
+    // Verificar actualizacion cada vez que abre la app
+    reg.update();
+    // Si hay un nuevo SW esperando, activarlo inmediatamente
+    reg.addEventListener('updatefound', function(){
+      var newWorker = reg.installing;
+      if(newWorker){
+        newWorker.addEventListener('statechange', function(){
+          if(newWorker.state==='installed' && navigator.serviceWorker.controller){
+            // Nuevo contenido disponible - mostrar banner
+            _newSW = newWorker;
+            document.getElementById('updateBanner').style.display = 'block';
+          }
+        });
+      }
+    });
+  }).catch(()=>{});
+  // Limpiar caches viejos al iniciar
+  if('caches' in window){
+    caches.keys().then(function(keys){
+      keys.forEach(function(key){
+        // Borrar cualquier cache que no sea el actual
+        caches.delete(key);
+      });
+    });
+  }
 }
 
 window.addEventListener("beforeinstallprompt",(e)=>{
@@ -1965,6 +2043,75 @@ window.addEventListener("DOMContentLoaded",()=>{
   try{_inyectarManifest();}catch(e){}
   try{_registrarSW();}catch(e){}
 });
+
+
+// ── DETECCIÓN DE ACTUALIZACIÓN Y PULL-TO-REFRESH ────────
+var _newSW = null;
+
+function aplicarActualizacion(){
+  // Limpiar todo el cache y recargar
+  if('caches' in window){
+    caches.keys().then(function(keys){
+      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }).then(function(){
+      if(_newSW) _newSW.postMessage({type:'SKIP_WAITING'});
+      window.location.reload(true);
+    });
+  } else {
+    if(_newSW) _newSW.postMessage({type:'SKIP_WAITING'});
+    window.location.reload(true);
+  }
+}
+
+// Escuchar actualizaciones del Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    // Nuevo SW activo - mostrar banner
+    document.getElementById('updateBanner').style.display = 'block';
+  });
+}
+
+// Pull-to-refresh (deslizar hacia abajo desde el tope)
+(function(){
+  var startY = 0;
+  var pulling = false;
+  var threshold = 80; // px necesarios para activar
+
+  document.addEventListener('touchstart', function(e){
+    if(window.scrollY === 0) {
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }
+  }, {passive:true});
+
+  document.addEventListener('touchmove', function(e){
+    if(!pulling) return;
+    var diff = e.touches[0].clientY - startY;
+    if(diff > threshold){
+      var banner = document.getElementById('updateBanner');
+      banner.style.display = 'block';
+      banner.textContent = '↕ Suelta para actualizar...';
+      banner.style.background = 'linear-gradient(90deg,#00C85A,#3DFF8F)';
+      banner.style.color = '#03070D';
+    }
+  }, {passive:true});
+
+  document.addEventListener('touchend', function(e){
+    if(!pulling) return;
+    var diff = e.changedTouches[0].clientY - startY;
+    pulling = false;
+    if(diff > threshold){
+      // Activar limpieza de cache
+      aplicarActualizacion();
+    } else {
+      var banner = document.getElementById('updateBanner');
+      banner.style.display = 'none';
+      banner.textContent = '🔄 Nueva versión disponible — Toca aquí para actualizar';
+      banner.style.background = 'linear-gradient(90deg,#0A84FF,#38BEFF)';
+      banner.style.color = '#fff';
+    }
+  }, {passive:true});
+})();
 
 </script>
 </body>
