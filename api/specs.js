@@ -43,7 +43,7 @@ Reglas:
 - resH = dimensión mayor en píxeles
 - hz = tasa de refresco máxima real
 - panel = tipo exacto del panel
-- ram = RAM máxima disponible en GB
+- ram = número entero de GB de RAM (ej: 4, 6, 8, 12) — la RAM total del dispositivo
 - Si no conoces el dispositivo, usa: {"resW":720,"resH":1600,"hz":60,"panel":"ips","ram":4}`
           }
         ]
@@ -82,11 +82,12 @@ Reglas:
 
     // Clamp valores sensatos
     specs.hz  = Math.min(Math.max(specs.hz  || 60,  30), 360);
-    specs.ram = Math.min(Math.max(specs.ram || 4,    1),  24);
+    // Parsear RAM correctamente — la IA a veces devuelve string
+    specs.ram = Math.min(Math.max(parseInt(specs.ram) || 4, 2), 24);
 
     return res.status(200).json(specs);
 
   } catch (e) {
     return res.status(500).json({ error: "Error interno" });
   }
-        }
+}
