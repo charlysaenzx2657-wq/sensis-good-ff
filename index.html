@@ -1422,7 +1422,11 @@ async function generarSensi(){
 
   // Rango del General según nivel, respetando el mínimo del perfil
   let genLo, genHi;
-  if(isIphone){ genLo = 89; genHi = 200; } else {
+  if(isIphone){
+    if(nivelSensi === "baja"){ genLo = 89; genHi = 120; }
+    else if(nivelSensi === "media"){ genLo = 121; genHi = 169; }
+    else { genLo = 172; genHi = 200; }
+  } else {
   if(nivelSensi === "baja"){
     genLo = clamp(Math.max(p.genMin, 149) + totalAdj, 149, 158);
     genHi = clamp(Math.min(158, p.genMax) + totalAdj, 149, 158);
