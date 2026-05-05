@@ -1422,20 +1422,22 @@ async function generarSensi(){
 
   // Rango del General según nivel, respetando el mínimo del perfil
   let genLo, genHi;
+  if(isIphone){ genLo = 89; genHi = 200; } else {
   if(nivelSensi === "baja"){
-    genLo = Math.max(p.genMin, 100);
-    genHi = Math.min(158, p.genMax);
+    genLo = clamp(Math.max(p.genMin, 149) + totalAdj, 149, 158);
+    genHi = clamp(Math.min(158, p.genMax) + totalAdj, 149, 158);
   } else if(nivelSensi === "media"){
-    genLo = Math.max(p.genMin, 159);
-    genHi = Math.min(175, p.genMax);
+    genLo = clamp(Math.max(p.genMin, 159) + totalAdj, 159, 171);
+    genHi = clamp(Math.min(171, p.genMax) + totalAdj, 159, 171);
   } else {
-    genLo = Math.max(p.genMin, 176);
-    genHi = Math.min(200, p.genMax);
+    genLo = clamp(Math.max(p.genMin, 176) + totalAdj, 176, 200);
+    genHi = clamp(Math.min(200, p.genMax) + totalAdj, 176, 200);
+  }
   }
   if(genLo > genHi){ genLo = p.genMin; genHi = p.genMax; }
 
   // General final con ajuste de resolución + Hz
-  const general = clamp(rand(genLo, genHi) + totalAdj, 100, 200);
+  const general = clamp(rand(genLo, genHi), 100, 200);
 
   // ── MODO HEADSHOT (VALORES ORIGINALES) ──────────────────────
   // 60% full | 30% mid | 10% normal
