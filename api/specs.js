@@ -1,9 +1,8 @@
 // api/specs.js — Vercel Serverless Function
-// La API key de Anthropic vive SOLO aquí, nunca llega al navegador
-// Modelo: claude-haiku-4-5 — el más rápido (~300-500ms)
+// Busca: resolución, Hz y tipo de panel
+// RAM eliminada — solo los datos que necesita la calibración
 
 export default async function handler(req, res) {
-  // Solo POST
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -13,7 +12,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Faltan marca o modelo" });
   }
 
-  // Key desde variable de entorno Vercel — nunca en el código
   const apiKey = process.env.ANTHROPIC_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: "Sin configuración" });
@@ -29,22 +27,12 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 120,
-        system: "Eres una base de datos de especificaciones de dispositivos móviles. Responde SOLO con JSON válido, sin texto adicional, sin markdown, sin explicaciones.",
+        max_tokens: 80,
+        system: "Eres una base de datos técnica de smartphones. Responde ÚNICAMENTE con JSON válido. Sin texto, sin markdown, sin explicaciones. Solo el JSON.",
         messages: [
           {
             role: "user",
-            content: `Dame las especificaciones reales de: ${marca} ${modelo}
-Responde ÚNICAMENTE este JSON (sin nada más):
-{"resW":ANCHO_PIXELES,"resH":ALTO_PIXELES,"hz":HZ_PANTALLA,"panel":"amoled|oled|ips|lcd","ram":GB_RAM}
-
-Reglas:
-- resW = dimensión menor en píxeles (ancho en portrait)
-- resH = dimensión mayor en píxeles
-- hz = tasa de refresco máxima real
-- panel = tipo exacto del panel
-- ram = número entero de GB de RAM (ej: 4, 6, 8, 12) — la RAM total del dispositivo
-- Si no conoces el dispositivo, usa: {"resW":720,"resH":1600,"hz":60,"panel":"ips","ram":4}`
+            content: `Especificaciones reales del dispositivo: ${marca} ${modelo}\n\nResponde SOLO este JSON exacto:\n{"resW":NUMERO,"resH":NUMERO,"hz":NUMERO,"panel":"TIPO"}\n\nDonde:\n- resW = ancho en píxeles (lado menor, portrait). Ejemplo: 1080\n- resH = alto en píxeles (lado mayor, portrait). Ejemplo: 2400\n- hz = tasa de refresco máxima en Hz. Ejemplo: 90\n- panel = exactamente una de estas palabras: amoled | oled | ips | lcd\n\nReglas importantes:\n- Samsung Galaxy S/Note/Z → panel siempre "amoled"\n- Samsung Galaxy A32+ → "amoled", A03-A23 → "ips"\n- Xiaomi/Redmi Note Pro, POCO X/F → "amoled"\n- Redmi básicos (6,7,8,9,10,12C) → "ips"\n- iPhones X en adelante → "oled", iPhone 6/7/8/SE → "lcd"\n- Si no conoces el dispositivo exacto responde: {"resW":720,"resH":1600,"hz":60,"panel":"ips"}`
           }
         ]
       })
@@ -57,37 +45,35 @@ Reglas:
     const aiData = await response.json();
     const text = aiData?.content?.[0]?.text?.trim() || "";
 
-    // Parsear JSON limpiando posibles backticks
     const clean = text.replace(/```json|```/g, "").trim();
     const specs = JSON.parse(clean);
 
-    // Validar campos mínimos
     if (!specs.resW || specs.resW < 300) {
       return res.status(422).json({ error: "Specs inválidas" });
     }
 
-    // Asegurar que resW sea el lado menor (ancho portrait)
     if (specs.resW > specs.resH) {
       const t = specs.resW;
       specs.resW = specs.resH;
       specs.resH = t;
     }
 
-    // Normalizar panel
-    const p = (specs.panel || "ips").toLowerCase();
+    const p = (specs.panel || "ips").toLowerCase().trim();
     specs.panel = p.includes("amoled") ? "amoled"
                 : p.includes("oled")   ? "oled"
                 : p.includes("lcd")    ? "lcd"
                 : "ips";
 
-    // Clamp valores sensatos
-    specs.hz  = Math.min(Math.max(specs.hz  || 60,  30), 360);
-    // Parsear RAM correctamente — la IA a veces devuelve string
-    specs.ram = Math.min(Math.max(parseInt(specs.ram) || 4, 2), 24);
+    specs.hz = Math.min(Math.max(parseInt(specs.hz) || 60, 30), 360);
 
-    return res.status(200).json(specs);
+    return res.status(200).json({
+      resW:  specs.resW,
+      resH:  specs.resH,
+      hz:    specs.hz,
+      panel: specs.panel
+    });
 
   } catch (e) {
     return res.status(500).json({ error: "Error interno" });
   }
-}
+      }
