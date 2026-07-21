@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENSIS GOOD FF - Panel Admin</title>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-auth-compat.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Rajdhani', 'Nunito', sans-serif; background: linear-gradient(135deg, #0a0e27 0%, #1a2355 50%, #0f1f3d 100%); color: #e0e0e0; min-height: 100vh; padding: 20px; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 40px; padding: 20px; border-bottom: 2px solid #00d4ff; }
+    .header h1 { font-size: 32px; background: linear-gradient(140deg, #00d4ff, #0099ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+    .status { background: rgba(0, 20, 80, 0.5); border: 1px solid #00d4ff; border-radius: 8px; padding: 15px; margin-bottom: 30px; text-align: center; }
+    .status.online { border-color: #3DFF8F; }
+    .requests-list { display: grid; gap: 15px; }
+    .request-card { background: rgba(4, 12, 35, 0.8); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 12px; padding: 20px; transition: all 0.3s ease; }
+    .request-card:hover { border-color: rgba(0, 212, 255, 0.5); box-shadow: 0 0 20px rgba(0, 212, 255, 0.1); }
+    .request-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .request-email { font-size: 16px; font-weight: 700; color: #00d4ff; }
+    .request-time { font-size: 12px; color: #666; }
+    .request-info { display: grid; gap: 8px; margin-bottom: 15px; }
+    .info-row { display: flex; justify-content: space-between; font-size: 13px; }
+    .info-label { color: #888; }
+    .info-value { color: #fff; font-weight: 600; }
+    .request-actions { display: flex; gap: 10px; }
+    .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; }
+    .btn-approve { background: linear-gradient(160deg, #3DFF8F, #00ff88); color: #000; }
+    .btn-approve:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(61, 255, 143, 0.3); }
+    .btn-reject { background: rgba(255, 85, 102, 0.2); border: 1px solid #FF5566; color: #FF5566; }
+    .btn-reject:hover { background: rgba(255, 85, 102, 0.3); }
+    .empty-state { text-align: center; padding: 60px 20px; color: #666; }
+    .logout-btn { position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: rgba(255, 85, 102, 0.2); border: 1px solid #FF5566; color: #FF5566; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<button class="logout-btn" onclick="logout()">🚪 Cerrar sesión</button>
+
+<div class="container">
+  <div class="header">
+    <h1>🔐 PANEL ADMINISTRATIVO</h1>
+    <p>SENSIS GOOD FF - Gestión de accesos</p>
+  </div>
+
+  <div class="status online">
+    <div style="font-weight:700;font-size:14px;">🟢 Conectado en tiempo real</div>
+  </div>
+
+  <div id="requestsContainer">
+    <div class="empty-state">
+      <div style="font-size:64px;margin-bottom:20px;opacity:0.3;">⏳</div>
+      <p>Cargando solicitudes...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyD3zSYSPnbXJ86qI3C0BQOVs94ap0tMzUY",
+  authDomain: "sensis-good-ff-1b999.firebaseapp.com",
+  databaseURL: "https://sensis-good-ff-1b999-default-rtdb.firebaseio.com",
+  projectId: "sensis-good-ff-1b999",
+  storageBucket: "sensis-good-ff-1b999.firebasestorage.app",
+  messagingSenderId: "708544119744",
+  appId: "1:708544119744:web:9c4c514e71ad83eb63be25"
+};
+
+function initAdmin() {
+  if(!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  const db = firebase.database();
+  const auth = firebase.auth();
+
+  auth.signInAnonymously().catch(err => console.error('Auth:', err));
+
+  function cargarSolicitudes() {
+    const container = document.getElementById('requestsContainer');
+    
+    db.ref('pendingAccess').on('value', snapshot => {
+      const requests = snapshot.val() || {};
+      const requestsArray = Object.entries(requests).map(([uid, data]) => ({uid, ...data})).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+      if (requestsArray.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div style="font-size:64px;margin-bottom:20px;opacity:0.3;">✅</div><p>No hay solicitudes pendientes</p></div>';
+        return;
+      }
+
+      container.innerHTML = requestsArray.map(req => `
+        <div class="request-card">
+          <div class="request-header">
+            <div class="request-email">${req.marca || 'Desconocido'} - ${req.modelo || 'Sin modelo'}</div>
+            <div class="request-time">${new Date(req.timestamp).toLocaleString()}</div>
+          </div>
+          <div class="request-info">
+            <div class="info-row">
+              <span class="info-label">Marca:</span>
+              <span class="info-value">${req.marca || 'N/A'}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Modelo:</span>
+              <span class="info-value">${req.modelo || 'N/A'}</span>
+            </div>
+          </div>
+          <div class="request-actions">
+            <button class="btn btn-approve" onclick="aprobar('${req.uid}')">✅ APROBAR</button>
+            <button class="btn btn-reject" onclick="rechazar('${req.uid}')">❌ RECHAZAR</button>
+          </div>
+        </div>
+      `).join('');
+    });
+  }
+
+  window.aprobar = function(uid) {
+    if (confirm('¿Aprobar este acceso?')) {
+      db.ref('pendingAccess/' + uid).remove();
+      db.ref('approvedUsers/' + uid).set({ approvedAt: Date.now() });
+      alert('✅ Acceso aprobado');
+    }
+  };
+
+  window.rechazar = function(uid) {
+    if (confirm('¿Rechazar esta solicitud?')) {
+      db.ref('pendingAccess/' + uid).remove();
+      alert('❌ Solicitud rechazada');
+    }
+  };
+
+  window.logout = function() {
+    auth.signOut().then(() => {
+      alert('Sesión cerrada');
+      window.location.href = '/';
+    });
+  };
+
+  cargarSolicitudes();
+}
+
+if(document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initAdmin, 500);
+  });
+} else {
+  setTimeout(initAdmin, 500);
+}
+</script>
+
+</body>
+</html>
