@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENSIS GOOD FF - Generador de Sensibilidades</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-auth-compat.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+    :root {
+      --bg: #0a0e27;
+      --a: #00d4ff;
+      --a-rgb: 0, 212, 255;
+      --b: #0099ff;
+      --b-rgb: 0, 153, 255;
+      --c: #00ff88;
+      --c-rgb: 0, 255, 136;
+      --text: #e0e0e0;
+      --soft: #888;
+    }
+    body { font-family: 'Rajdhani', sans-serif; background: linear-gradient(135deg, #0a0e27 0%, #1a2355 50%, #0f1f3d 100%); color: var(--text); min-height: 100vh; }
+    
+    #loginScreen { position: fixed; inset: 0; z-index: 99999; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 20px; font-family: 'Rajdhani', sans-serif; }
+    #loginScreen.hidden { display: none; }
+    .login-logo { font-family: 'Nunito', sans-serif; font-size: clamp(22px, 6vw, 40px); font-weight: 900; letter-spacing: 3px; text-transform: uppercase; background: linear-gradient(140deg, #ffffff 0%, #B8E8FF 25%, var(--a) 50%, var(--b) 75%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 22px rgba(var(--a-rgb), 0.55)); margin-bottom: 6px; text-align: center; }
+    .login-sub { font-size: 11px; font-weight: 700; letter-spacing: 5px; color: var(--soft); text-transform: uppercase; margin-bottom: 36px; text-align: center; }
+    .login-card { width: 100%; max-width: 400px; background: rgba(4, 12, 35, 0.97); border: 1px solid rgba(var(--a-rgb), 0.2); border-radius: 24px; padding: 28px 22px; box-shadow: 0 8px 40px rgba(0, 20, 80, 0.5); }
+    .login-title { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--a); margin-bottom: 8px; text-align: center; }
+    .login-desc { font-size: 13px; font-weight: 600; color: var(--soft); text-align: center; margin-bottom: 24px; line-height: 1.6; }
+    .login-info { background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; padding: 12px; margin-bottom: 15px; font-size: 12px; color: #ccc; }
+    .login-info-label { color: #888; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+    .login-info-value { color: var(--a); font-weight: 700; margin-top: 4px; }
+    .login-input { width: 100%; background: rgba(4, 16, 48, 0.92); border-radius: 14px; padding: 14px 18px; color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; outline: none; border: 1px solid rgba(var(--a-rgb), 0.18); text-align: left; transition: border-color 0.2s ease; -webkit-appearance: none; margin-bottom: 12px; }
+    .login-input:focus { border-color: rgba(var(--a-rgb), 0.5); }
+    .login-input::placeholder { font-size: 13px; color: rgba(var(--a-rgb), 0.28); }
+    .login-status { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-align: center; min-height: 20px; margin: 10px 0 4px; transition: color 0.2s ease; }
+    .login-status.ok { color: #3DFF8F; }
+    .login-status.err { color: #FF5566; }
+    .login-status.info { color: var(--soft); }
+    .login-status.pending { color: #FFD700; }
+    .login-btn { width: 100%; padding: 15px; margin-top: 12px; background: linear-gradient(160deg, var(--a) 0%, var(--b) 50%, var(--c) 100%); border: none; border-radius: 14px; color: #fff; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 20px rgba(var(--b-rgb), 0.35); transition: transform 0.1s ease, filter 0.1s ease; -webkit-tap-highlight-color: transparent; }
+    .login-btn:active { transform: scale(0.97); filter: brightness(0.9); }
+    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .login-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    #mainContent { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-logo">SENSIS GOOD FF</div>
+  <div class="login-sub">GENERADOR DE SENSIBILIDADES</div>
+  <div class="login-card">
+    <div class="login-title">🔐 SOLICITAR ACCESO</div>
+    <div class="login-desc">Tu dispositivo será detectado automáticamente.</div>
+    <div class="login-info">
+      <div class="login-info-label">📱 Tu dispositivo</div>
+      <div class="login-info-value" id="deviceInfo">Detectando...</div>
+    </div>
+    <input class="login-input" type="text" id="modeloInput" placeholder="Modelo (ej: Galaxy S23, iPhone 14 Pro)" autocomplete="off">
+    <button class="login-btn" id="btnSolicitar" onclick="solicitarAcceso()">✅ SOLICITAR ACCESO</button>
+    <div class="login-status info" id="loginStatus"></div>
+    <div id="esperandoAprobacion" style="display:none;">
+      <div class="login-status pending" style="margin-top:20px;">⏳ Esperando aprobación...</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENIDO PRINCIPAL (GENERADOR) -->
+<div id="mainContent">
+  <p>Contenido del generador de sensibilidades...</p>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyD3zSYSPnbXJ86qI3C0BQOVs94ap0tMzUY",
+  authDomain: "sensis-good-ff-1b999.firebaseapp.com",
+  databaseURL: "https://sensis-good-ff-1b999-default-rtdb.firebaseio.com",
+  projectId: "sensis-good-ff-1b999",
+  storageBucket: "sensis-good-ff-1b999.firebasestorage.app",
+  messagingSenderId: "708544119744",
+  appId: "1:708544119744:web:9c4c514e71ad83eb63be25"
+};
+
+function initLogin() {
+  if(!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  const db = firebase.database();
+  const auth = firebase.auth();
+
+  function detectarDispositivo() {
+    const ua = navigator.userAgent;
+
+    // Apple (celular/tablet)
+    if(/iPhone|iPad|iPod/.test(ua)) return "Apple";
+
+    // Escritorio
+    if(/Windows/.test(ua)) return "Windows";
+    if(/Macintosh|Mac OS X/.test(ua) && !/Mobile/.test(ua)) return "macOS";
+    if(/Linux/.test(ua) && !/Android/.test(ua)) return "Linux";
+
+    // Android: intenta detectar la marca real dentro del user agent
+    if(/Android/.test(ua)) {
+      if(/Samsung|SM-|GT-/.test(ua)) return "Samsung";
+      if(/Xiaomi|Redmi|POCO|Mi\s/.test(ua)) return "Xiaomi";
+      if(/Huawei|Honor/.test(ua)) return "Huawei";
+      if(/Realme/.test(ua)) return "Realme";
+      if(/OPPO|CPH\d/.test(ua)) return "OPPO";
+      if(/Vivo/.test(ua)) return "Vivo";
+      if(/Moto|Motorola/.test(ua)) return "Motorola";
+      if(/OnePlus/.test(ua)) return "OnePlus";
+      if(/Nokia/.test(ua)) return "Nokia";
+      if(/LG-|LGE/.test(ua)) return "LG";
+      if(/Sony/.test(ua)) return "Sony";
+      // Android moderno a veces oculta la marca en el user agent por privacidad
+      return "Android (marca no detectada)";
+    }
+
+    return "Desconocido";
+  }
+
+  document.getElementById('deviceInfo').textContent = detectarDispositivo();
+  auth.signInAnonymously().catch(err => console.error('Auth:', err));
+
+  auth.onAuthStateChanged(user => {
+    if(user) {
+      db.ref('approvedUsers/' + user.uid).once('value', snap => {
+        if(snap.exists()) {
+          document.getElementById('loginScreen').classList.add('hidden');
+          document.getElementById('mainContent').style.display = 'block';
+        }
+      });
+    }
+  });
+
+  window.solicitarAcceso = function() {
+    const modelo = document.getElementById('modeloInput').value.trim();
+    const marca = document.getElementById('deviceInfo').textContent;
+    const btn = document.getElementById('btnSolicitar');
+    const status = document.getElementById('loginStatus');
+
+    if(!modelo) {
+      status.className = 'login-status err';
+      status.textContent = '❌ Ingresa el modelo';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="login-spinner"></span>ENVIANDO...';
+    status.className = 'login-status info';
+    status.textContent = 'Enviando...';
+
+    if(!auth.currentUser) {
+      status.className = 'login-status err';
+      status.textContent = '❌ Error de autenticación';
+      return;
+    }
+
+    db.ref('pendingAccess/' + auth.currentUser.uid).set({
+      marca: marca,
+      modelo: modelo,
+      timestamp: Date.now()
+    }).then(() => {
+      status.className = 'login-status ok';
+      status.textContent = '✅ Solicitud enviada';
+      document.getElementById('esperandoAprobacion').style.display = 'block';
+
+      const int = setInterval(() => {
+        db.ref('approvedUsers/' + auth.currentUser.uid).once('value', snap => {
+          if(snap.exists()) {
+            clearInterval(int);
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainContent').style.display = 'block';
+          }
+        });
+      }, 2000);
+
+      setTimeout(() => clearInterval(int), 10*60*1000);
+    }).catch(e => {
+      status.className = 'login-status err';
+      status.textContent = '❌ Error: ' + e.message;
+      btn.disabled = false;
+    });
+  };
+}
+
+// Esperar a que Firebase esté listo
+if(document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initLogin, 500);
+  });
+} else {
+  setTimeout(initLogin, 500);
+}
+</script>
+
+</body>
+</html>
