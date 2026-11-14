@@ -25,7 +25,10 @@
       --a-rgb:56,190,255; --b-rgb:10,132,255; --c-rgb:0,80,230; --d-rgb:0,58,176;
       --hzmul:1; /* 1.0x = velocidad base de animación; sube con el Hz elegido en Configuración */
       --glow:rgba(var(--a-rgb),0.65); --glow2:rgba(var(--b-rgb),0.4);
-      --bg:#03070D; --text:#E4F2FF; --soft:rgba(var(--a-rgb),0.55);
+      --bg-rgb:3,7,14; --bg:rgb(var(--bg-rgb)); --text-rgb:235,249,255; --text:rgb(var(--text-rgb));
+      --n0-rgb:2,8,24; --n1-rgb:4,13,40; --n2-rgb:6,18,54; --n3-rgb:10,30,76; /* fondos oscuros: se tiñen con el tema */
+      --tint1-rgb:187,233,255; --tint2-rgb:132,215,255; /* tintes claros del acento */
+      --soft:rgba(var(--a-rgb),0.55);
       --line:rgba(var(--a-rgb),0.2);
       --f:83ms; --m:160ms; --s:300ms;
       --spring:cubic-bezier(0.34,1.56,0.64,1);
@@ -57,14 +60,14 @@
     body{background:var(--bg);font-family:'Rajdhani',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column;align-items:center;}
 
     /* Orbes */
-    .orb{position:fixed;border-radius:50%;filter:blur(45px);pointer-events:none;z-index:0;will-change:transform;transform:translate3d(0,0,0);contain:strict;}
+    .orb{position:fixed;border-radius:50%;filter:blur(36px);pointer-events:none;z-index:0;will-change:transform;transform:translate3d(0,0,0);contain:strict;}
     .orb-1{width:480px;height:480px;top:-80px;left:-80px;background:radial-gradient(circle,rgba(var(--b-rgb),0.42) 0%,transparent 70%);animation-name:orb1;animation-duration:calc(28s / var(--hzmul));animation-timing-function:ease-in-out;animation-iteration-count:infinite;}
     .orb-2{width:520px;height:520px;bottom:-120px;right:-100px;background:radial-gradient(circle,rgba(var(--a-rgb),0.30) 0%,transparent 70%);animation-name:orb2;animation-duration:calc(34s / var(--hzmul));animation-timing-function:ease-in-out;animation-iteration-count:infinite;}
     .orb-3{width:320px;height:320px;top:35%;left:40%;background:radial-gradient(circle,rgba(var(--c-rgb),0.32) 0%,transparent 70%);animation-name:orb3;animation-duration:calc(22s / var(--hzmul));animation-timing-function:ease-in-out;animation-iteration-count:infinite;}
 
     /* Fluidez general: scroll suave; will-change SOLO en lo que anima de forma continua
        (demasiados will-change en elementos estáticos crean capas GPU innecesarias y causan lag) */
-    html{scroll-behavior:smooth;}
+    html{scroll-behavior:auto;}
 
     /* Respeta la preferencia del sistema por menos movimiento (más fluido en gama baja) */
     @media (prefers-reduced-motion: reduce){
@@ -77,9 +80,9 @@
     .logo{
       font-family:'Nunito',sans-serif;font-size:clamp(24px,6vw,46px);font-weight:900;letter-spacing:3px;text-transform:uppercase;
       display:inline-block;animation-name:logoFloat;animation-duration:calc(4.5s / var(--hzmul));animation-timing-function:ease-in-out;animation-iteration-count:infinite;
-      background:linear-gradient(140deg,#ffffff 0%,#B8E8FF 25%,var(--a) 50%,var(--b) 75%,#7AC8FF 100%);
+      background:linear-gradient(140deg,#ffffff 0%,rgb(var(--tint1-rgb)) 25%,var(--a) 50%,var(--b) 75%,rgb(var(--tint2-rgb)) 100%);
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-      filter:drop-shadow(0 0 22px rgba(var(--a-rgb),0.55)) drop-shadow(0 6px 14px rgba(0,70,200,0.45)) drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+      filter:drop-shadow(0 0 22px rgba(var(--a-rgb),0.55)) drop-shadow(0 6px 14px rgba(var(--d-rgb),0.45)) drop-shadow(0 2px 3px rgba(0,0,0,0.5));
     }
     .tagline{margin-top:10px;font-size:12px;font-weight:600;letter-spacing:6px;color:var(--soft);text-transform:uppercase;animation-name:breathe;animation-duration:calc(3.5s / var(--hzmul));animation-timing-function:ease-in-out;animation-iteration-count:infinite;}
     .hbar-wrap{display:flex;gap:7px;justify-content:center;align-items:center;margin-top:22px;}
@@ -117,11 +120,10 @@
 
     .panel{
       position:relative;z-index:10;width:100%;margin:16px 0 30px;padding:26px 16px;border-radius:26px;
-      background:rgba(4,12,35,0.97);
+      background:rgba(var(--n1-rgb),0.97);
       backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
       animation:fadeUp var(--s) var(--ease) both;
       overflow:visible;
-      will-change:transform;
       isolation:isolate;
     }
     /* Glow RGB en pseudo-elemento: solo toca opacity/transform → sin repaint */
@@ -157,19 +159,19 @@
     /* Campos */
     .field{margin-bottom:20px;}
     .field label{display:block;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--soft);margin-bottom:8px;}
-    .field input[type="text"],.field input[type="password"],.field select{
-      width:100%;background:rgba(4,16,48,0.92);border-radius:14px;padding:13px 18px;
+    .field input[type="text"],.field input[type="password"],.field input[type="number"],.field input[type="search"],.field input[type="tel"],.field input[type="email"],.field select{
+      width:100%;background:rgba(var(--n1-rgb),0.92);border-radius:14px;padding:13px 18px;
       color:var(--text);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;outline:none;-webkit-appearance:none;
       border:1px solid rgba(var(--a-rgb),0.14);position:relative;z-index:2;
-      box-shadow:0 2px 12px rgba(0,10,40,0.3),inset 0 1px 0 rgba(255,255,255,0.03);
+      box-shadow:0 2px 12px rgba(var(--n1-rgb),0.3),inset 0 1px 0 rgba(255,255,255,0.03);
       transition:background var(--m) ease,border-color var(--m) ease,transform var(--f) var(--spring);
     }
     .field input:focus,.field select:focus{
-      border-color:rgba(var(--a-rgb),0.45);background:rgba(5,22,62,0.98);transform:translateY(-1px);
+      border-color:rgba(var(--a-rgb),0.45);background:rgba(var(--n2-rgb),0.98);
       box-shadow:0 0 0 3px rgba(var(--a-rgb),0.08),0 4px 16px rgba(var(--d-rgb),0.3);
     }
     .field input::placeholder{color:rgba(var(--a-rgb),0.28);}
-    .field select option{background:#060F22;color:var(--text);}
+    .field select option{background:rgb(var(--n1-rgb));color:var(--text);}
 
     .cfg-color-modo{display:flex;gap:8px;margin:4px 0 12px;}
 
@@ -195,7 +197,7 @@
     .cfg-theme-dot{
       width:42px;height:42px;border-radius:50%;cursor:pointer;
       border:2px solid rgba(255,255,255,0.12);
-      box-shadow:0 4px 12px rgba(0,10,40,0.35);
+      box-shadow:0 4px 12px rgba(var(--n1-rgb),0.35);
       transition:transform var(--f) var(--spring),border-color var(--m) ease,box-shadow var(--m) ease;
     }
     .cfg-theme-dot:hover{transform:scale(1.1);}
@@ -204,11 +206,11 @@
     .field-check{
       display:flex;align-items:center;gap:14px;padding:13px 18px;
       border:1px solid rgba(var(--a-rgb),0.12);border-radius:14px;
-      background:rgba(4,16,48,0.6);margin-bottom:20px;cursor:pointer;
-      box-shadow:0 2px 8px rgba(0,10,40,0.2);
+      background:rgba(var(--n1-rgb),0.6);margin-bottom:20px;cursor:pointer;
+      box-shadow:0 2px 8px rgba(var(--n1-rgb),0.2);
       transition:all var(--m) var(--ease);
     }
-    .field-check:hover{background:rgba(6,24,70,0.8);border-color:rgba(var(--a-rgb),0.28);transform:translateY(-1px);box-shadow:0 4px 14px rgba(var(--c-rgb),0.18);}
+    .field-check:hover{background:rgba(var(--n3-rgb),0.8);border-color:rgba(var(--a-rgb),0.28);transform:translateY(-1px);box-shadow:0 4px 14px rgba(var(--c-rgb),0.18);}
     .field-check input[type="checkbox"]{width:18px;height:18px;accent-color:var(--a);cursor:pointer;}
     .field-check span{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--soft);}
 
@@ -217,17 +219,17 @@
       width:100%;padding:15px 20px;margin-top:10px;
       background:linear-gradient(160deg,var(--a) 0%,var(--b) 35%,var(--c) 70%,var(--d) 100%);
       border:none;border-radius:16px;color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;letter-spacing:2px;text-transform:uppercase;
-      cursor:pointer;position:relative;overflow:hidden;text-shadow:0 1px 6px rgba(0,0,60,0.5);z-index:2;
+      cursor:pointer;position:relative;overflow:hidden;text-shadow:0 1px 6px rgba(var(--n2-rgb),0.5);z-index:2;
       animation-name:btnPulse;animation-duration:calc(4s / var(--hzmul));animation-timing-function:ease-in-out;animation-iteration-count:infinite;
       transition:transform var(--f) var(--spring),filter var(--f) ease,box-shadow var(--f) ease;
-      box-shadow:0 1px 0 rgba(255,255,255,0.22) inset,0 -1px 0 rgba(0,0,50,0.4) inset,0 4px 0 rgba(var(--d-rgb),0.8),0 8px 28px rgba(var(--b-rgb),0.35),0 0 0 1px rgba(var(--a-rgb),0.1);
+      box-shadow:0 1px 0 rgba(255,255,255,0.22) inset,0 -1px 0 rgba(var(--n1-rgb),0.4) inset,0 4px 0 rgba(var(--d-rgb),0.8),0 8px 28px rgba(var(--b-rgb),0.35),0 0 0 1px rgba(var(--a-rgb),0.1);
       will-change:transform;
     }
     .btn::before{content:'';position:absolute;top:0;left:0;width:38%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);animation-name:shimmer;animation-duration:calc(3.5s / var(--hzmul));animation-timing-function:ease-in-out;animation-iteration-count:infinite;will-change:transform;}
     .btn::after{content:'';position:absolute;top:0;left:0;right:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,0.16) 0%,transparent 100%);border-radius:16px 16px 50% 50%;pointer-events:none;}
-    .btn:hover{animation:none;transform:translateY(-3px);filter:brightness(1.1) saturate(1.08);box-shadow:0 1px 0 rgba(255,255,255,0.28) inset,0 -1px 0 rgba(0,0,50,0.4) inset,0 6px 0 rgba(var(--d-rgb),0.8),0 16px 44px rgba(var(--b-rgb),0.4),0 0 30px rgba(var(--a-rgb),0.2);}
-    .btn:active{animation:none;transform:translateY(2px);filter:brightness(0.95);box-shadow:0 1px 0 rgba(255,255,255,0.14) inset,0 -1px 0 rgba(0,0,50,0.4) inset,0 2px 0 rgba(var(--d-rgb),0.8),0 3px 10px rgba(var(--b-rgb),0.2);}
-    .btn-ghost{background:rgba(10,100,230,0.10);border:1.5px solid rgba(var(--a-rgb),0.35);box-shadow:0 0 14px rgba(var(--a-rgb),0.12),inset 0 1px 0 rgba(255,255,255,0.04);color:var(--a);font-size:12px;letter-spacing:2px;}
+    .btn:hover{animation:none;transform:translateY(-3px);filter:brightness(1.1) saturate(1.08);box-shadow:0 1px 0 rgba(255,255,255,0.28) inset,0 -1px 0 rgba(var(--n1-rgb),0.4) inset,0 6px 0 rgba(var(--d-rgb),0.8),0 16px 44px rgba(var(--b-rgb),0.4),0 0 30px rgba(var(--a-rgb),0.2);}
+    .btn:active{animation:none;transform:translateY(2px);filter:brightness(0.95);box-shadow:0 1px 0 rgba(255,255,255,0.14) inset,0 -1px 0 rgba(var(--n1-rgb),0.4) inset,0 2px 0 rgba(var(--d-rgb),0.8),0 3px 10px rgba(var(--b-rgb),0.2);}
+    .btn-ghost{background:rgba(var(--c-rgb),0.10);border:1.5px solid rgba(var(--a-rgb),0.35);box-shadow:0 0 14px rgba(var(--a-rgb),0.12),inset 0 1px 0 rgba(255,255,255,0.04);color:var(--a);font-size:12px;letter-spacing:2px;}
     .btn-ghost::before,.btn-ghost::after{display:none;}
     .btn-ghost:hover{background:rgba(var(--b-rgb),0.2);border-color:rgba(var(--a-rgb),0.5);box-shadow:0 0 26px rgba(var(--a-rgb),0.2),inset 0 1px 0 rgba(255,255,255,0.06);transform:translateY(-2px);}
 
@@ -235,13 +237,13 @@
     .result-wrapper{margin-top:28px;animation:resultIn var(--s) var(--ease) both;will-change:transform,opacity;}
     .result-label{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--soft);margin-bottom:11px;}
     .result-box{
-      background:linear-gradient(148deg,rgba(4,14,45,0.98) 0%,rgba(2,8,28,0.99) 100%);
+      background:linear-gradient(148deg,rgba(var(--n1-rgb),0.98) 0%,rgba(var(--n0-rgb),0.99) 100%);
       border:1px solid rgba(var(--a-rgb),0.2);border-radius:20px;padding:28px 22px;
-      font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;line-height:1;color:#A0D8FF;
+      font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;line-height:1;color:rgb(var(--tint1-rgb));
       position:relative;z-index:2;
       box-shadow:0 8px 32px rgba(var(--d-rgb),0.4),inset 0 1px 0 rgba(255,255,255,0.05),inset 0 0 0 1px rgba(var(--a-rgb),0.04);
     }
-    .result-box::before{content:'✦ SENSI ACTIVA';position:absolute;top:-12px;left:22px;background:linear-gradient(90deg,var(--c),var(--b));color:#fff;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:3px;padding:3px 16px;border-radius:99px;box-shadow:0 4px 14px rgba(10,120,255,0.5),0 1px 0 rgba(255,255,255,0.1) inset;z-index:5;}
+    .result-box::before{content:'✦ SENSI ACTIVA';position:absolute;top:-12px;left:22px;background:linear-gradient(90deg,var(--c),var(--b));color:#fff;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:3px;padding:3px 16px;border-radius:99px;box-shadow:0 4px 14px rgba(var(--b-rgb),0.5),0 1px 0 rgba(255,255,255,0.1) inset;z-index:5;}
     .sensi-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;}
     
     .sensi-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(var(--a-rgb),0.55);flex:1;}
@@ -256,41 +258,41 @@
     .c-green {color:#3DFF8F;text-shadow:0 0 14px rgba(61,255,143,0.8);}
     .c-yellow{color:#FFD84A;text-shadow:0 0 14px rgba(255,216,74,0.75);}
     .c-red   {color:#FF5E5E;text-shadow:0 0 14px rgba(255,94,94,0.8);}
-    .c-gray  {color:#C0D8F0;text-shadow:0 0 8px rgba(192,216,240,0.4);}
+    .c-gray  {color:rgb(var(--tint1-rgb));text-shadow:0 0 8px rgba(var(--tint1-rgb),0.4);}
     .c-cyan  {color:#5FFFFF;text-shadow:0 0 14px rgba(95,255,255,0.7);}
     .bar-blue  {background:linear-gradient(90deg,var(--b),var(--a));}
     .bar-green {background:linear-gradient(90deg,#00C85A,#3DFF8F);}
     .bar-yellow{background:linear-gradient(90deg,#D08000,#FFD84A);}
     .bar-red   {background:linear-gradient(90deg,#BB1100,#FF5E5E);}
-    .bar-gray  {background:linear-gradient(90deg,#607898,#C0D8F0);}
+    .bar-gray  {background:linear-gradient(90deg,#607898,rgb(var(--tint1-rgb)));}
     .bar-cyan  {background:linear-gradient(90deg,#009999,#5FFFFF);}
     .btn-power-badge{display:inline-block;margin-left:8px;background:rgba(255,216,74,0.12);border:1px solid rgba(255,216,74,0.35);border-radius:99px;font-size:9px;font-weight:900;letter-spacing:1px;color:#FFD84A;padding:2px 9px;vertical-align:middle;}
 
     /* Menú */
-    .menu-toggle{position:absolute;top:20px;right:20px;width:36px;height:30px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;z-index:300;padding:5px;border:1px solid var(--line);border-radius:12px;background:rgba(8,25,65,0.7);transition:all var(--m) var(--ease);box-shadow:0 2px 0 rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.05);}
+    .menu-toggle{position:absolute;top:20px;right:20px;width:36px;height:30px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;z-index:300;padding:5px;border:1px solid var(--line);border-radius:12px;background:rgba(var(--n2-rgb),0.7);transition:all var(--m) var(--ease);box-shadow:0 2px 0 rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.05);}
     .menu-toggle:hover{border-color:rgba(var(--a-rgb),0.45);transform:scale(1.06);box-shadow:0 0 18px rgba(var(--a-rgb),0.2),inset 0 1px 0 rgba(255,255,255,0.08);}
     .menu-toggle span{display:block;height:2px;background:linear-gradient(90deg,var(--b),var(--a));border-radius:99px;box-shadow:0 0 5px rgba(var(--a-rgb),0.45);}
-    .menu-dropdown{position:absolute;top:60px;right:20px;background:rgba(4,13,38,0.97);border:1px solid var(--line);border-radius:20px;min-width:220px;z-index:400;display:none;overflow:hidden;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 24px 60px rgba(0,0,0,0.7),0 0 40px rgba(var(--b-rgb),0.1),inset 0 1px 0 rgba(255,255,255,0.06);}
+    .menu-dropdown{position:absolute;top:60px;right:20px;background:rgba(var(--n1-rgb),0.97);border:1px solid var(--line);border-radius:20px;min-width:220px;z-index:400;display:none;overflow:hidden;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);box-shadow:0 24px 60px rgba(0,0,0,0.7),0 0 40px rgba(var(--b-rgb),0.1),inset 0 1px 0 rgba(255,255,255,0.06);}
     .menu-dropdown.is-open{display:block;animation:menuIn var(--m) var(--ease);}
     .menu-dropdown div{padding:14px 20px;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--soft);cursor:pointer;transition:all var(--m) var(--ease);display:flex;align-items:center;gap:10px;}
     
     .menu-dropdown div:hover{background:rgba(var(--c-rgb),0.16);color:var(--text);padding-left:26px;}
 
     /* Help */
-    .help-btn{position:absolute;top:16px;right:16px;background:rgba(8,55,150,0.3);border:1px solid var(--line);border-radius:99px;color:var(--soft);font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;padding:5px 14px;cursor:pointer;text-transform:uppercase;transition:all var(--m) var(--ease);box-shadow:0 2px 0 rgba(0,0,0,0.2);}
+    .help-btn{position:absolute;top:16px;right:16px;background:rgba(var(--d-rgb),0.3);border:1px solid var(--line);border-radius:99px;color:var(--soft);font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;padding:5px 14px;cursor:pointer;text-transform:uppercase;transition:all var(--m) var(--ease);box-shadow:0 2px 0 rgba(0,0,0,0.2);}
     .help-btn:hover{border-color:var(--a);color:var(--a);background:rgba(var(--b-rgb),0.16);box-shadow:0 0 18px rgba(var(--a-rgb),0.22);}
 
 
     /* COMBOS */
     .combo-grid{display:flex;flex-direction:column;gap:18px;margin-bottom:26px;}
-    .combo-card{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(6,18,50,0.6);}
+    .combo-card{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(var(--n2-rgb),0.6);}
     .combo-name{font-family:'Nunito',sans-serif;font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase;padding:12px 16px;background:linear-gradient(90deg,var(--a),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
     .combo-img{width:100%;display:block;border-radius:0 0 16px 16px;}
 
     /* HUDs */
     .hud-grid{display:grid;gap:14px;margin-bottom:26px;}
-    .hud-card{border:1px solid var(--line);border-radius:20px;padding:18px 20px;background:rgba(6,18,50,0.6);box-shadow:0 2px 0 rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.04);transition:all var(--m) var(--ease);}
-    .hud-card:hover{border-color:rgba(var(--a-rgb),0.38);background:rgba(8,30,80,0.72);transform:translateY(-3px);box-shadow:0 10px 30px rgba(var(--b-rgb),0.22),inset 0 1px 0 rgba(255,255,255,0.06);}
+    .hud-card{border:1px solid var(--line);border-radius:20px;padding:18px 20px;background:rgba(var(--n2-rgb),0.6);box-shadow:0 2px 0 rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.04);transition:all var(--m) var(--ease);}
+    .hud-card:hover{border-color:rgba(var(--a-rgb),0.38);background:rgba(var(--n3-rgb),0.72);transform:translateY(-3px);box-shadow:0 10px 30px rgba(var(--b-rgb),0.22),inset 0 1px 0 rgba(255,255,255,0.06);}
     .hud-name{font-family:'Nunito',sans-serif;font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;background:linear-gradient(90deg,var(--a),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
     .hud-code{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;color:var(--soft);word-break:break-all;margin-bottom:12px;}
     .hud-card .btn{margin-top:0;padding:10px;font-size:11px;animation:none;}
@@ -301,9 +303,9 @@
     .dpi-lupa{position:absolute;left:14px;font-size:14px;pointer-events:none;opacity:0.6;}
     .dpi-clear{position:absolute;right:14px;font-size:13px;cursor:pointer;color:rgba(var(--a-rgb),0.5);padding:4px;}
     .dpi-clear:hover{color:var(--a);}
-    #dpiModeloBuscar{width:100%;background:rgba(5,20,55,0.4);border:none;border-radius:16px;padding:13px 40px;
+    #dpiModeloBuscar{width:100%;background:rgba(var(--n2-rgb),0.4);border:none;border-radius:16px;padding:13px 40px;
       color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;outline:none;}
-    .dpi-lista{max-height:220px;overflow-y:auto;background:rgba(4,13,38,0.98);border-radius:16px;
+    .dpi-lista{max-height:220px;overflow-y:auto;background:rgba(var(--n1-rgb),0.98);border-radius:16px;
       margin-top:6px;border:1px solid rgba(var(--a-rgb),0.18);
       box-shadow:0 12px 40px rgba(0,0,0,0.6);}
     .dpi-lista-item{padding:11px 18px;font-size:14px;font-weight:600;letter-spacing:1px;
@@ -320,7 +322,7 @@
       font-size:12px;font-weight:700;letter-spacing:2px;color:var(--a);text-transform:uppercase;}
     .dpi-no-results{padding:14px 18px;font-size:12px;letter-spacing:2px;color:rgba(var(--a-rgb),0.4);text-align:center;}
     .dpi-result-card{border-radius:22px;padding:26px 22px;
-      background:linear-gradient(148deg,rgba(4,14,42,0.97) 0%,rgba(2,9,30,0.99) 100%);
+      background:linear-gradient(148deg,rgba(var(--n1-rgb),0.97) 0%,rgba(var(--n0-rgb),0.99) 100%);
       border:1px solid rgba(var(--a-rgb),0.22);
       box-shadow:inset 0 1px 0 rgba(255,255,255,0.05),0 0 40px rgba(var(--b-rgb),0.1);
       text-align:center;position:relative;}
@@ -332,7 +334,7 @@
     .dpi-res-sub{font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(var(--a-rgb),0.5);margin-top:8px;text-transform:uppercase;line-height:1.7;}
     .dpi-bars{display:flex;justify-content:center;gap:5px;margin:16px 0 10px;}
     .dpi-bar-seg{height:6px;border-radius:99px;flex:1;background:rgba(var(--a-rgb),0.1);transition:background 0.4s ease;}
-    .dpi-bar-seg.active-low   {background:linear-gradient(90deg,#607898,#B0C8E8);}
+    .dpi-bar-seg.active-low   {background:linear-gradient(90deg,#607898,rgb(var(--tint1-rgb)));}
     .dpi-bar-seg.active-mid   {background:linear-gradient(90deg,var(--b),var(--a));}
     .dpi-bar-seg.active-high  {background:linear-gradient(90deg,#00C85A,#3DFF8F);}
     .dpi-bar-seg.active-vhigh {background:linear-gradient(90deg,#D08000,#FFD84A);}
@@ -411,13 +413,13 @@
     .ios-sheet{
       position:fixed;bottom:12px;left:10px;right:10px;z-index:5001;
       height:88vh;max-height:88vh;
-      background:linear-gradient(180deg,#0B1F4A 0%,#060E28 100%);
+      background:linear-gradient(180deg,rgb(var(--n3-rgb)) 0%,rgb(var(--n1-rgb)) 100%);
       border-radius:26px;
       border:1.5px solid rgba(var(--a-rgb),0.35);
       overflow:hidden;
       display:flex;flex-direction:column;
       animation:iosSheetIn 0.42s cubic-bezier(0.34,1.56,0.64,1) forwards;
-      box-shadow:0 0 80px rgba(0,30,120,0.85),0 0 18px 4px rgba(var(--a-rgb),0.2);
+      box-shadow:0 0 80px rgba(var(--d-rgb),0.85),0 0 18px 4px rgba(var(--a-rgb),0.2);
     }
     .ios-sheet.closing{animation:iosSheetOut 0.3s cubic-bezier(0.22,1,0.36,1) forwards;}
 
@@ -459,12 +461,12 @@
     }
     .ios-fade-top{
       position:absolute;top:0;left:0;right:0;height:120px;
-      background:linear-gradient(to bottom,#060E28 0%,rgba(6,14,40,0) 100%);
+      background:linear-gradient(to bottom,rgb(var(--n1-rgb)) 0%,rgba(var(--n1-rgb),0) 100%);
       pointer-events:none;z-index:3;
     }
     .ios-fade-bottom{
       position:absolute;bottom:0;left:0;right:0;height:120px;
-      background:linear-gradient(to top,#060E28 0%,rgba(6,14,40,0) 100%);
+      background:linear-gradient(to top,rgb(var(--n1-rgb)) 0%,rgba(var(--n1-rgb),0) 100%);
       pointer-events:none;z-index:3;
     }
     .ios-wheel{
@@ -493,7 +495,7 @@
       color:#fff;font-weight:800;
       text-shadow:0 0 14px rgba(var(--a-rgb),0.7);
     }
-    .ios-item.ios-near{color:rgba(200,230,255,0.75);}
+    .ios-item.ios-near{color:rgba(var(--tint1-rgb),0.75);}
 
     .ios-item.ios-item-custom{
       color:var(--a);font-size:15px;font-weight:700;letter-spacing:0.5px;
@@ -525,17 +527,17 @@
     }
     .ios-search-clear:active{color:#fff;}
     .ios-trigger{
-      width:100%;background:rgba(4,16,48,0.92);border-radius:14px;
+      width:100%;background:rgba(var(--n1-rgb),0.92);border-radius:14px;
       border:1px solid rgba(var(--a-rgb),0.14);
       padding:13px 18px;color:var(--text);font-family:'Rajdhani',sans-serif;
       font-size:16px;font-weight:600;outline:none;cursor:pointer;
       display:flex;align-items:center;justify-content:space-between;
       position:relative;z-index:2;
-      box-shadow:0 2px 12px rgba(0,10,40,0.3),inset 0 1px 0 rgba(255,255,255,0.03);
+      box-shadow:0 2px 12px rgba(var(--n1-rgb),0.3),inset 0 1px 0 rgba(255,255,255,0.03);
       transition:background var(--m) ease,border-color var(--m) ease,transform var(--f) var(--spring);
       -webkit-tap-highlight-color:transparent;
     }
-    .ios-trigger:active{background:rgba(5,22,62,0.98);border-color:rgba(var(--a-rgb),0.3);transform:scale(0.98);}
+    .ios-trigger:active{background:rgba(var(--n2-rgb),0.98);border-color:rgba(var(--a-rgb),0.3);transform:scale(0.98);}
     /* Los textos del trigger deben estar encima del fondo */
     .ios-trigger .ios-trigger-text,
     .ios-trigger .ios-arrow{
@@ -571,7 +573,7 @@
     .splash-letters{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;padding:0 20px;}
     .splash-letters span{
       font-family:'Nunito',sans-serif;font-size:clamp(28px,8vw,56px);font-weight:900;letter-spacing:2px;
-      background:linear-gradient(140deg,#ffffff 0%,#B8E8FF 25%,var(--a) 55%,var(--b) 80%);
+      background:linear-gradient(140deg,#ffffff 0%,rgb(var(--tint1-rgb)) 25%,var(--a) 55%,var(--b) 80%);
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
       filter:drop-shadow(0 0 18px rgba(var(--a-rgb),0.7));
       opacity:0;animation:letterDrop 0.5s var(--spring) forwards;
@@ -593,7 +595,7 @@
     @media(max-width:540px){.panel{margin:16px 0;padding:24px 14px;}.logo{font-size:20px;letter-spacing:2px;}}
     /* ── SCROLLBAR GLOBAL ── */
     ::-webkit-scrollbar{width:5px;}
-    ::-webkit-scrollbar-track{background:rgba(0,8,24,0.5);}
+    ::-webkit-scrollbar-track{background:rgba(var(--n0-rgb),0.5);}
     ::-webkit-scrollbar-thumb{background:rgba(var(--a-rgb),0.22);border-radius:99px;}
     ::-webkit-scrollbar-thumb:hover{background:rgba(var(--a-rgb),0.4);}
 
@@ -607,8 +609,8 @@
     /* ── COMBO & HUD CARDS mejoradas ── */
     .combo-card{
       border:1px solid rgba(var(--a-rgb),0.14);
-      background:rgba(4,14,42,0.7);
-      box-shadow:0 4px 20px rgba(0,10,50,0.3);
+      background:rgba(var(--n1-rgb),0.7);
+      box-shadow:0 4px 20px rgba(var(--n1-rgb),0.3);
       transition:border-color var(--m) ease,transform var(--m) var(--ease);
     }
     .combo-card:hover{border-color:rgba(var(--a-rgb),0.3);transform:translateY(-2px);}
@@ -625,7 +627,7 @@
 
     /* ── IOS SHEET borde ── */
     .ios-sheet{
-      box-shadow:0 0 60px rgba(0,20,90,0.8),0 0 0 1px rgba(var(--a-rgb),0.18);
+      box-shadow:0 0 60px rgba(var(--n3-rgb),0.8),0 0 0 1px rgba(var(--a-rgb),0.18);
     }
 
     /* ── ANIMACIÓN ENTRADA SUAVE resultado ── */
@@ -656,15 +658,15 @@
 <style>
 #loginScreen{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;font-family:'Rajdhani',sans-serif;}
 #loginScreen.hidden{display:none;}
-.login-logo{font-family:'Nunito',sans-serif;font-size:clamp(22px,6vw,40px);font-weight:900;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(140deg,#ffffff 0%,#B8E8FF 25%,var(--a) 50%,var(--b) 75%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 22px rgba(var(--a-rgb),0.55));margin-bottom:6px;text-align:center;}
+.login-logo{font-family:'Nunito',sans-serif;font-size:clamp(22px,6vw,40px);font-weight:900;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(140deg,#ffffff 0%,rgb(var(--tint1-rgb)) 25%,var(--a) 50%,var(--b) 75%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 22px rgba(var(--a-rgb),0.55));margin-bottom:6px;text-align:center;}
 .login-sub{font-size:11px;font-weight:700;letter-spacing:5px;color:var(--soft);text-transform:uppercase;margin-bottom:36px;text-align:center;}
-.login-card{width:100%;max-width:400px;background:rgba(4,12,35,0.97);border:1px solid rgba(var(--a-rgb),0.2);border-radius:24px;padding:28px 22px;box-shadow:0 8px 40px rgba(0,20,80,0.5);}
+.login-card{width:100%;max-width:400px;background:rgba(var(--n1-rgb),0.97);border:1px solid rgba(var(--a-rgb),0.2);border-radius:24px;padding:28px 22px;box-shadow:0 8px 40px rgba(var(--n3-rgb),0.5);}
 .login-title{font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--a);margin-bottom:8px;text-align:center;}
 .login-desc{font-size:13px;font-weight:600;color:var(--soft);text-align:center;margin-bottom:24px;line-height:1.6;}
 .login-info{background:rgba(var(--a-rgb),0.08);border:1px solid rgba(var(--a-rgb),0.2);border-radius:10px;padding:12px;margin-bottom:15px;font-size:12px;color:#ccc;}
 .login-info-label{color:#888;font-size:11px;letter-spacing:1px;text-transform:uppercase;}
 .login-info-value{color:var(--a);font-weight:700;margin-top:4px;}
-.login-input{width:100%;background:rgba(4,16,48,0.92);border-radius:14px;padding:14px 18px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;outline:none;border:1px solid rgba(var(--a-rgb),0.18);text-align:left;transition:border-color 0.2s ease;-webkit-appearance:none;margin-bottom:12px;}
+.login-input{width:100%;background:rgba(var(--n1-rgb),0.92);border-radius:14px;padding:14px 18px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;outline:none;border:1px solid rgba(var(--a-rgb),0.18);text-align:left;transition:border-color 0.2s ease;-webkit-appearance:none;margin-bottom:12px;}
 .login-input:focus{border-color:rgba(var(--a-rgb),0.5);}
 .login-input::placeholder{font-size:13px;color:rgba(var(--a-rgb),0.28);}
 .login-status{font-size:12px;font-weight:700;letter-spacing:1.5px;text-align:center;min-height:20px;margin:10px 0 4px;transition:color 0.2s ease;}
@@ -972,7 +974,7 @@ if(document.readyState === 'loading') {
         <option>SENSI PREMIUM</option><option>SENSI XIT</option><option>Sensibilidad VIP</option><option>Teléfono Modificado ☠️</option>
       </select>
     </div>
-    <div class="field" id="modeloField"><label><b class="word-hl">Modelo</b> del dispositivo</label><div class="" style="border-radius:16px;"><input type="text" id="modelo" placeholder="Ej: Galaxy A54" style="position:relative;z-index:2;width:100%;background:rgba(5,20,55,0.98);border-radius:16px;padding:13px 18px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;outline:none;-webkit-appearance:none;border:none;"/></div></div>
+    <div class="field" id="modeloField"><label><b class="word-hl">Modelo</b> del dispositivo</label><div class="" style="border-radius:16px;"><input type="text" id="modelo" placeholder="Ej: Galaxy A54" style="position:relative;z-index:2;width:100%;background:rgba(var(--n2-rgb),0.98);border-radius:16px;padding:13px 18px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;outline:none;-webkit-appearance:none;border:none;"/></div></div>
     <div class="field-check" id="dpiCheckbox"><input type="checkbox" id="usarDpi"><span>Usar DPI personalizado</span></div>
     <button class="btn" onclick="generarSensi()">⚡ Generar <b class="word-hl" style="color:#fff;text-shadow:0 0 12px rgba(255,255,255,0.6)">Sensibilidad</b></button>
     <div id="result" style="display:none;">
@@ -1188,45 +1190,83 @@ if(document.readyState === 'loading') {
           <option value="720x1544">720×1544 (HD+)</option>
           <option value="720x1560">720×1560 (HD+)</option>
           <option value="720x1600">720×1600 (HD+)</option>
+          <option value="720x1604">720×1604 (HD+)</option>
           <option value="720x1612">720×1612 (HD+)</option>
           <option value="720x1640">720×1640 (HD+)</option>
           <option value="720x1650">720×1650 (HD+)</option>
+          <option value="750x1334">750×1334 (HD+)</option>
+          <option value="800x1280">800×1280 (HD+)</option>
+          <option value="828x1792">828×1792 (FHD+)</option>
           <option value="1080x1920">1080×1920 (FHD)</option>
+          <option value="1080x2142">1080×2142 (FHD+)</option>
           <option value="1080x2160">1080×2160 (FHD+)</option>
           <option value="1080x2220">1080×2220 (FHD+)</option>
+          <option value="1080x2240">1080×2240 (FHD+)</option>
           <option value="1080x2244">1080×2244 (FHD+)</option>
+          <option value="1080x2246">1080×2246 (FHD+)</option>
+          <option value="1080x2268">1080×2268 (FHD+)</option>
+          <option value="1080x2270">1080×2270 (FHD+)</option>
           <option value="1080x2280">1080×2280 (FHD+)</option>
           <option value="1080x2310">1080×2310 (FHD+)</option>
+          <option value="1080x2312">1080×2312 (FHD+)</option>
           <option value="1080x2340">1080×2340 (FHD+)</option>
           <option value="1080x2376">1080×2376 (FHD+)</option>
           <option value="1080x2388">1080×2388 (FHD+)</option>
           <option value="1080x2392">1080×2392 (FHD+)</option>
           <option value="1080x2394">1080×2394 (FHD+)</option>
           <option value="1080x2400">1080×2400 (FHD+)</option>
+          <option value="1080x2404">1080×2404 (FHD+)</option>
           <option value="1080x2408">1080×2408 (FHD+)</option>
           <option value="1080x2412">1080×2412 (FHD+)</option>
+          <option value="1080x2424">1080×2424 (FHD+)</option>
+          <option value="1080x2432">1080×2432 (FHD+)</option>
+          <option value="1080x2436">1080×2436 (FHD+)</option>
+          <option value="1080x2448">1080×2448 (FHD+)</option>
           <option value="1080x2460">1080×2460 (FHD+)</option>
+          <option value="1080x2480">1080×2480 (FHD+)</option>
           <option value="1080x2520">1080×2520 (FHD+)</option>
           <option value="1080x2640">1080×2640 (FHD+)</option>
           <option value="1080x2664">1080×2664 (FHD+)</option>
+          <option value="1116x2480">1116×2480 (FHD+)</option>
+          <option value="1125x2436">1125×2436 (FHD+)</option>
           <option value="1170x2532">1170×2532 (Super Retina)</option>
+          <option value="1176x2400">1176×2400 (FHD+)</option>
           <option value="1179x2556">1179×2556 (Super Retina)</option>
+          <option value="1200x1920">1200×1920 (FHD+)</option>
+          <option value="1200x2640">1200×2640 (FHD+)</option>
+          <option value="1200x2664">1200×2664 (FHD+)</option>
           <option value="1200x2670">1200×2670 (FHD+)</option>
           <option value="1206x2622">1206×2622 (Super Retina)</option>
+          <option value="1212x2616">1212×2616 (QHD-)</option>
+          <option value="1220x2700">1220×2700 (QHD-)</option>
           <option value="1220x2712">1220×2712 (FHD+)</option>
           <option value="1224x2700">1224×2700 (FHD+)</option>
+          <option value="1228x2700">1228×2700 (QHD-)</option>
           <option value="1240x2772">1240×2772 (QHD-)</option>
+          <option value="1242x2688">1242×2688 (QHD-)</option>
+          <option value="1260x2720">1260×2720 (QHD-)</option>
+          <option value="1260x2730">1260×2730 (QHD-)</option>
+          <option value="1260x2736">1260×2736 (QHD-)</option>
           <option value="1260x2800">1260×2800 (QHD+)</option>
           <option value="1264x2780">1264×2780 (QHD+)</option>
+          <option value="1280x2772">1280×2772 (QHD-)</option>
+          <option value="1280x2800">1280×2800 (QHD-)</option>
+          <option value="1280x2856">1280×2856 (QHD-)</option>
           <option value="1284x2778">1284×2778 (Super Retina XDR)</option>
           <option value="1290x2796">1290×2796 (Super Retina XDR)</option>
           <option value="1320x2868">1320×2868 (Super Retina XDR)</option>
+          <option value="1344x2772">1344×2772 (QHD-)</option>
+          <option value="1344x2992">1344×2992 (QHD-)</option>
           <option value="1440x2560">1440×2560 (QHD)</option>
+          <option value="1440x2880">1440×2880 (QHD+)</option>
           <option value="1440x2960">1440×2960 (QHD+)</option>
           <option value="1440x3040">1440×3040 (QHD+)</option>
           <option value="1440x3088">1440×3088 (QHD+)</option>
+          <option value="1440x3120">1440×3120 (QHD+)</option>
           <option value="1440x3168">1440×3168 (QHD+)</option>
           <option value="1440x3200">1440×3200 (QHD+)</option>
+          <option value="1440x3216">1440×3216 (QHD+)</option>
+          <option value="1644x3840">1644×3840 (QHD+)</option>
           <option value="custom">✏️ Personalizada...</option>
         </select>
       </div>
@@ -1617,9 +1657,12 @@ function _buscarEnDB(marca, modelo){
   let found = _dbMarca.find(d => d.m.toLowerCase() === _modeloQ);
 
   // 2) Coincidencia parcial dentro de la marca seleccionada
-  if(!found) found = _dbMarca.find(d =>
-    d.m.toLowerCase().includes(_modeloQ) || _modeloQ.includes(d.m.toLowerCase())
-  );
+  if(!found){
+    // varias coincidencias parciales: se elige la de nombre más parecido en longitud
+    // (con tantos modelos, "el primero que contiene el texto" ya no sirve)
+    const _cand = _dbMarca.filter(d => d.m.toLowerCase().includes(_modeloQ) || _modeloQ.includes(d.m.toLowerCase()));
+    if(_cand.length) found = _cand.reduce((a,b) => Math.abs(a.m.length - _modeloQ.length) <= Math.abs(b.m.length - _modeloQ.length) ? a : b);
+  }
 
   // 3) Solo si la marca elegida NO tiene registros propios, buscamos en
   //    el resto de la DB (último recurso, nunca sustituye a la marca real)
@@ -2337,7 +2380,7 @@ async function generarSensi(){
   const _resLabel = resCat==="hd" ? "HD" : resCat==="fhd" ? "FHD" : "QHD+";
   const _hzColor  = deviceHz >= 165 ? "#5FFFFF"
                 : deviceHz >= 120 ? "#3DFF8F"
-                : deviceHz >=  90 ? "#38BEFF"
+                : deviceHz >=  90 ? "var(--a)"
                 :                   "#FFD84A";
   const _hzBonus  = hzBonus > 0
     ? ` <span style="color:${_hzColor};font-size:8px;font-weight:900">+${hzBonus}Hz BOOST</span>` : "";
@@ -2623,6 +2666,25 @@ function aplicarTema(nombres){
   root.setProperty("--d-rgb", _hexToRgbTriplet(t.d));
   root.setProperty("--glow", "rgba(" + _hexToRgbTriplet(t.a) + ",0.65)");
   root.setProperty("--glow2", "rgba(" + _hexToRgbTriplet(t.b) + ",0.4)");
+  // Variables derivadas: fondos oscuros, tintes claros y texto siguen el tema, así TODO
+  // (paneles, tarjetas, campos, menús, textos, fondo y efectos) cambia de color por completo.
+  const _dv = _hexToRgbTriplet(t.d).split(",").map(Number);
+  const _av = _hexToRgbTriplet(t.a).split(",").map(Number);
+  const _kd = 176 / Math.max(1, Math.max.apply(null, _dv)); // normaliza la intensidad entre temas
+  const _osc = (f, piso) => _dv.map(v => Math.round(Math.min(255, v*_kd*f + piso))).join(",");
+  const _mez = f => _av.map(v => Math.round(v + (255 - v) * f)).join(",");
+  const _bgRgb = _osc(0.0625, 3);
+  root.setProperty("--bg-rgb", _bgRgb);
+  root.setProperty("--n0-rgb", _osc(0.125, 2));
+  root.setProperty("--n1-rgb", _osc(0.205, 4));
+  root.setProperty("--n2-rgb", _osc(0.273, 6));
+  root.setProperty("--n3-rgb", _osc(0.375, 10));
+  root.setProperty("--tint1-rgb", _mez(0.66));
+  root.setProperty("--tint2-rgb", _mez(0.38));
+  root.setProperty("--text-rgb", _mez(0.90));
+  window._fxBgRGB = _bgRgb; // el fondo animado (canvas) usa el mismo color base
+  const _meta = document.querySelector('meta[name="theme-color"]');
+  if(_meta) _meta.setAttribute("content", _rgbTripletToHex(_bgRgb));
   document.querySelectorAll("#cfgThemeGrid .cfg-theme-dot").forEach(el=>{
     el.classList.toggle("is-active", _temasSeleccionados.includes(el.dataset.theme));
   });
@@ -2788,7 +2850,7 @@ function _fxFrame(t){
   const accentRgb = getComputedStyle(document.documentElement).getPropertyValue("--a-rgb").trim() || "56,190,255";
 
   if(_fxKind === "matrix"){
-    _fxCtx.fillStyle = "rgba(2,6,14,0.18)";
+    _fxCtx.fillStyle = "rgba(" + (window._fxBgRGB || "3,7,14") + ",0.18)";
     _fxCtx.fillRect(0,0,w,h);
     _fxCtx.font = "14px monospace";
     const chars = "01アイウエオカキクケコサシスセゼ";
@@ -2866,7 +2928,7 @@ function _fxFrame(t){
     const st = _fxItems[0];
     if(!st) { _fxRAF = requestAnimationFrame(_fxFrame); return; }
     // Fondo oscuro de tormenta con leve resplandor del flash actual
-    _fxCtx.fillStyle = st.flash > 0 ? `rgba(30,40,60,${0.12 + st.flash*0.25})` : "rgba(3,7,13,0.35)";
+    _fxCtx.fillStyle = st.flash > 0 ? `rgba(30,40,60,${0.12 + st.flash*0.25})` : ("rgba(" + (window._fxBgRGB || "3,7,14") + ",0.35)");
     _fxCtx.fillRect(0,0,w,h);
     // Nubes bajas
     st.nubes.forEach(n=>{
@@ -2921,7 +2983,7 @@ function _fxFrame(t){
       }
     });
   } else if(_fxKind === "estrellas"){
-    _fxCtx.fillStyle = "rgba(3,7,13,1)";
+    _fxCtx.fillStyle = "rgba(" + (window._fxBgRGB || "3,7,14") + ",1)";
     _fxCtx.fillRect(0,0,w,h);
     _fxItems.forEach(d=>{
       d.phase += d.speed;
@@ -3011,6 +3073,47 @@ function copiarHudFallback(c){
 
 // Base de datos completa marca → modelos [{m, res, inch, hz}]
 const DB_DPI = {
+"iPhone":[
+  {m:"iPhone 6s",             res:"750x1334",  inch:4.7,  hz:60,  panel:"ips",    ram:2},
+  {m:"iPhone 7",              res:"750x1334",  inch:4.7,  hz:60,  panel:"ips",    ram:2},
+  {m:"iPhone 7 Plus",         res:"1080x1920", inch:5.5,  hz:60,  panel:"ips",    ram:3},
+  {m:"iPhone 8",              res:"750x1334",  inch:4.7,  hz:60,  panel:"ips",    ram:2},
+  {m:"iPhone 8 Plus",         res:"1080x1920", inch:5.5,  hz:60,  panel:"ips",    ram:3},
+  {m:"iPhone X",              res:"1125x2436", inch:5.8,  hz:60,  panel:"oled",   ram:3},
+  {m:"iPhone XR",             res:"828x1792",  inch:6.1,  hz:60,  panel:"ips",    ram:3},
+  {m:"iPhone XS",             res:"1125x2436", inch:5.8,  hz:60,  panel:"oled",   ram:4},
+  {m:"iPhone XS Max",         res:"1242x2688", inch:6.5,  hz:60,  panel:"oled",   ram:4},
+  {m:"iPhone 11",             res:"828x1792",  inch:6.1,  hz:60,  panel:"ips",    ram:4},
+  {m:"iPhone 11 Pro",         res:"1125x2436", inch:5.8,  hz:60,  panel:"oled",   ram:4},
+  {m:"iPhone 11 Pro Max",     res:"1242x2688", inch:6.5,  hz:60,  panel:"oled",   ram:4},
+  {m:"iPhone SE 2020",        res:"750x1334",  inch:4.7,  hz:60,  panel:"ips",    ram:3},
+  {m:"iPhone SE 2022",        res:"750x1334",  inch:4.7,  hz:60,  panel:"ips",    ram:4},
+  {m:"iPhone 12 mini",        res:"1080x2340", inch:5.4,  hz:60,  panel:"oled",   ram:4},
+  {m:"iPhone 12",             res:"1170x2532", inch:6.1,  hz:60,  panel:"oled",   ram:4},
+  {m:"iPhone 12 Pro",         res:"1170x2532", inch:6.1,  hz:60,  panel:"oled",   ram:6},
+  {m:"iPhone 12 Pro Max",     res:"1284x2778", inch:6.7,  hz:60,  panel:"oled",   ram:6},
+  {m:"iPhone 13 mini",        res:"1080x2340", inch:5.4,  hz:60,  panel:"oled",   ram:4},
+  {m:"iPhone 13",             res:"1170x2532", inch:6.1,  hz:60,  panel:"oled",   ram:4},
+  {m:"iPhone 13 Pro",         res:"1170x2532", inch:6.1,  hz:120, panel:"oled",   ram:6},
+  {m:"iPhone 13 Pro Max",     res:"1284x2778", inch:6.7,  hz:120, panel:"oled",   ram:6},
+  {m:"iPhone 14",             res:"1170x2532", inch:6.1,  hz:60,  panel:"oled",   ram:6},
+  {m:"iPhone 14 Plus",        res:"1284x2778", inch:6.7,  hz:60,  panel:"oled",   ram:6},
+  {m:"iPhone 14 Pro",         res:"1179x2556", inch:6.1,  hz:120, panel:"oled",   ram:6},
+  {m:"iPhone 14 Pro Max",     res:"1290x2796", inch:6.7,  hz:120, panel:"oled",   ram:6},
+  {m:"iPhone 15",             res:"1179x2556", inch:6.1,  hz:60,  panel:"oled",   ram:6},
+  {m:"iPhone 15 Plus",        res:"1290x2796", inch:6.7,  hz:60,  panel:"oled",   ram:6},
+  {m:"iPhone 15 Pro",         res:"1179x2556", inch:6.1,  hz:120, panel:"oled",   ram:8},
+  {m:"iPhone 15 Pro Max",     res:"1290x2796", inch:6.7,  hz:120, panel:"oled",   ram:8},
+  {m:"iPhone 16",             res:"1179x2556", inch:6.1,  hz:60,  panel:"oled",   ram:8},
+  {m:"iPhone 16 Plus",        res:"1290x2796", inch:6.7,  hz:60,  panel:"oled",   ram:8},
+  {m:"iPhone 16e",            res:"1170x2532", inch:6.1,  hz:60,  panel:"oled",   ram:8},
+  {m:"iPhone 16 Pro",         res:"1206x2622", inch:6.3,  hz:120, panel:"oled",   ram:8},
+  {m:"iPhone 16 Pro Max",     res:"1320x2868", inch:6.9,  hz:120, panel:"oled",   ram:8},
+  {m:"iPhone 17",             res:"1206x2622", inch:6.3,  hz:120, panel:"oled",   ram:8},
+  {m:"iPhone 17 Pro",         res:"1206x2622", inch:6.3,  hz:120, panel:"oled",   ram:12},
+  {m:"iPhone 17 Pro Max",     res:"1320x2868", inch:6.9,  hz:120, panel:"oled",   ram:12},
+  {m:"iPhone Air",            res:"1260x2736", inch:6.5,  hz:120, panel:"oled",   ram:12},
+],
 "Samsung":[
   {m:"Galaxy S3",           res:"720x1280",  inch:4.8,  hz:60, panel:"amoled", ram:6},
   {m:"Galaxy S4",           res:"1080x1920", inch:5.0,  hz:60, panel:"amoled", ram:6},
@@ -3066,6 +3169,43 @@ const DB_DPI = {
   {m:"Galaxy M54",          res:"1080x2340", inch:6.7,  hz:120, panel:"amoled", ram:6},
   {m:"Galaxy F14",          res:"1080x2408", inch:6.6,  hz:90, panel:"ips", ram:4},
   {m:"Galaxy F15",          res:"1080x2408", inch:6.5,  hz:90, panel:"ips", ram:4},
+  {m:"Galaxy S25",            res:"1080x2340", inch:6.2,  hz:120, panel:"amoled", ram:12},
+  {m:"Galaxy S25 Ultra",      res:"1440x3120", inch:6.9,  hz:120, panel:"amoled", ram:12},
+  {m:"Galaxy S24 FE",         res:"1080x2340", inch:6.7,  hz:120, panel:"amoled", ram:8},
+  {m:"Galaxy S23 FE",         res:"1080x2340", inch:6.4,  hz:120, panel:"amoled", ram:8},
+  {m:"Galaxy S21 FE",         res:"1080x2340", inch:6.4,  hz:120, panel:"amoled", ram:6},
+  {m:"Galaxy S20 FE",         res:"1080x2400", inch:6.5,  hz:120, panel:"amoled", ram:6},
+  {m:"Galaxy S10e",           res:"1080x2280", inch:5.8,  hz:60,  panel:"amoled", ram:6},
+  {m:"Galaxy Note 10",        res:"1080x2280", inch:6.3,  hz:60,  panel:"amoled", ram:8},
+  {m:"Galaxy Note 20",        res:"1080x2400", inch:6.7,  hz:60,  panel:"amoled", ram:8},
+  {m:"Galaxy Note 20 Ultra",  res:"1440x3088", inch:6.9,  hz:120, panel:"amoled", ram:12},
+  {m:"Galaxy A02s",           res:"720x1600",  inch:6.5,  hz:60,  panel:"lcd",    ram:3},
+  {m:"Galaxy A04e",           res:"720x1600",  inch:6.5,  hz:60,  panel:"lcd",    ram:3},
+  {m:"Galaxy A06",            res:"720x1600",  inch:6.7,  hz:60,  panel:"lcd",    ram:4},
+  {m:"Galaxy A10",            res:"720x1520",  inch:6.2,  hz:60,  panel:"lcd",    ram:2},
+  {m:"Galaxy A11",            res:"720x1560",  inch:6.4,  hz:60,  panel:"lcd",    ram:2},
+  {m:"Galaxy A16",            res:"1080x2340", inch:6.7,  hz:90,  panel:"amoled", ram:4},
+  {m:"Galaxy A20",            res:"720x1560",  inch:6.4,  hz:60,  panel:"amoled", ram:3},
+  {m:"Galaxy A21s",           res:"720x1600",  inch:6.5,  hz:60,  panel:"lcd",    ram:4},
+  {m:"Galaxy A26",            res:"1080x2340", inch:6.7,  hz:120, panel:"amoled", ram:6},
+  {m:"Galaxy A30",            res:"1080x2340", inch:6.4,  hz:60,  panel:"amoled", ram:3},
+  {m:"Galaxy A31",            res:"1080x2400", inch:6.4,  hz:60,  panel:"amoled", ram:4},
+  {m:"Galaxy A36",            res:"1080x2340", inch:6.7,  hz:120, panel:"amoled", ram:8},
+  {m:"Galaxy A50",            res:"1080x2340", inch:6.4,  hz:60,  panel:"amoled", ram:4},
+  {m:"Galaxy A51",            res:"1080x2400", inch:6.5,  hz:60,  panel:"amoled", ram:6},
+  {m:"Galaxy A56",            res:"1080x2340", inch:6.7,  hz:120, panel:"amoled", ram:8},
+  {m:"Galaxy A71",            res:"1080x2400", inch:6.7,  hz:60,  panel:"amoled", ram:6},
+  {m:"Galaxy A72",            res:"1080x2400", inch:6.7,  hz:90,  panel:"amoled", ram:6},
+  {m:"Galaxy A73",            res:"1080x2400", inch:6.7,  hz:120, panel:"amoled", ram:6},
+  {m:"Galaxy M31",            res:"1080x2340", inch:6.4,  hz:60,  panel:"amoled", ram:6},
+  {m:"Galaxy M32",            res:"720x1600",  inch:6.4,  hz:90,  panel:"amoled", ram:4},
+  {m:"Galaxy M33",            res:"1080x2408", inch:6.6,  hz:120, panel:"lcd",    ram:6},
+  {m:"Galaxy M52",            res:"1080x2400", inch:6.7,  hz:120, panel:"amoled", ram:6},
+  {m:"Galaxy M53",            res:"1080x2400", inch:6.7,  hz:120, panel:"amoled", ram:6},
+  {m:"Galaxy S25+",           res:"1440x3120", inch:6.7,  hz:120, panel:"amoled", ram:12},
+  {m:"Galaxy S9+",            res:"1440x2960", inch:6.2,  hz:60,  panel:"amoled", ram:6},
+  {m:"Galaxy S8+",            res:"1440x2960", inch:6.2,  hz:60,  panel:"amoled", ram:4},
+  {m:"Galaxy Note 10+",       res:"1440x3040", inch:6.8,  hz:60,  panel:"amoled", ram:12},
 ],
 "Xiaomi":[
   {m:"Redmi 6",             res:"720x1440",  inch:5.45, hz:60, panel:"ips", ram:4},
@@ -3103,6 +3243,43 @@ const DB_DPI = {
   {m:"POCO M5",             res:"1080x2400", inch:6.58, hz:90, panel:"ips", ram:4},
   {m:"POCO M6 Pro",         res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:4},
   {m:"POCO F5",             res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:4},
+  {m:"Redmi 7A",              res:"720x1440",  inch:5.45, hz:60,  panel:"ips",    ram:2},
+  {m:"Redmi 8A",              res:"720x1520",  inch:6.22, hz:60,  panel:"ips",    ram:2},
+  {m:"Redmi 9T",              res:"1080x2340", inch:6.53, hz:60,  panel:"ips",    ram:4},
+  {m:"Redmi 10A",             res:"720x1600",  inch:6.53, hz:60,  panel:"ips",    ram:3},
+  {m:"Redmi 13",              res:"1080x2460", inch:6.79, hz:90,  panel:"ips",    ram:6},
+  {m:"Redmi 14C",             res:"720x1640",  inch:6.88, hz:120, panel:"ips",    ram:4},
+  {m:"Redmi A1",              res:"720x1600",  inch:6.52, hz:60,  panel:"ips",    ram:2},
+  {m:"Redmi A2",              res:"720x1600",  inch:6.52, hz:60,  panel:"ips",    ram:2},
+  {m:"Redmi A3",              res:"720x1600",  inch:6.71, hz:90,  panel:"ips",    ram:3},
+  {m:"Redmi Note 7",          res:"1080x2340", inch:6.3,  hz:60,  panel:"ips",    ram:4},
+  {m:"Redmi Note 8 Pro",      res:"1080x2340", inch:6.53, hz:60,  panel:"ips",    ram:6},
+  {m:"Redmi Note 8T",         res:"1080x2340", inch:6.3,  hz:60,  panel:"ips",    ram:4},
+  {m:"Redmi Note 9S",         res:"1080x2400", inch:6.67, hz:60,  panel:"ips",    ram:6},
+  {m:"Redmi Note 10S",        res:"1080x2400", inch:6.43, hz:60,  panel:"amoled", ram:6},
+  {m:"Redmi Note 10 5G",      res:"1080x2400", inch:6.5,  hz:90,  panel:"ips",    ram:4},
+  {m:"Redmi Note 11S",        res:"1080x2400", inch:6.43, hz:90,  panel:"amoled", ram:6},
+  {m:"Redmi Note 12 Pro",     res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"Redmi Note 12S",        res:"1080x2400", inch:6.43, hz:90,  panel:"amoled", ram:8},
+  {m:"Redmi Note 14",         res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:6},
+  {m:"Redmi Note 14 Pro",     res:"1220x2712", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"Mi 9",                  res:"1080x2340", inch:6.39, hz:60,  panel:"amoled", ram:6},
+  {m:"Mi 10",                 res:"1080x2340", inch:6.67, hz:90,  panel:"amoled", ram:8},
+  {m:"Mi 10T",                res:"1080x2400", inch:6.67, hz:144, panel:"ips",    ram:6},
+  {m:"Mi 11",                 res:"1440x3200", inch:6.81, hz:120, panel:"amoled", ram:8},
+  {m:"Mi 11 Lite",            res:"1080x2400", inch:6.55, hz:90,  panel:"amoled", ram:6},
+  {m:"Xiaomi 11T",            res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"Xiaomi 12 Lite",        res:"1080x2400", inch:6.55, hz:120, panel:"amoled", ram:6},
+  {m:"Xiaomi 12T",            res:"1220x2712", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"Xiaomi 13 Lite",        res:"1080x2400", inch:6.55, hz:120, panel:"amoled", ram:8},
+  {m:"Xiaomi 13T Pro",        res:"1220x2712", inch:6.67, hz:144, panel:"amoled", ram:12},
+  {m:"Xiaomi 14T",            res:"1220x2712", inch:6.67, hz:144, panel:"amoled", ram:12},
+  {m:"Xiaomi 14T Pro",        res:"1220x2712", inch:6.67, hz:144, panel:"amoled", ram:12},
+  {m:"Xiaomi 14 Ultra",       res:"1440x3200", inch:6.73, hz:120, panel:"amoled", ram:16},
+  {m:"Xiaomi 15",             res:"1200x2670", inch:6.36, hz:120, panel:"amoled", ram:12},
+  {m:"Xiaomi 15 Ultra",       res:"1440x3200", inch:6.73, hz:120, panel:"amoled", ram:16},
+  {m:"Redmi Note 13 Pro+",    res:"1220x2712", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"Redmi Note 14 Pro+",    res:"1220x2712", inch:6.67, hz:120, panel:"amoled", ram:8},
 ],
 "Poco":[
   {m:"POCO C40",           res:"720x1600",  inch:6.71, hz:60, panel:"ips", ram:4},
@@ -3136,6 +3313,20 @@ const DB_DPI = {
   {m:"POCO F5 Pro",        res:"1440x3200", inch:6.67, hz:120, panel:"amoled", ram:4},
   {m:"POCO F6",            res:"1220x2712", inch:6.67, hz:120, panel:"amoled", ram:4},
   {m:"POCO F6 Pro",        res:"1440x3200", inch:6.67, hz:120, panel:"amoled", ram:4},
+  {m:"POCO C61",              res:"720x1600",  inch:6.71, hz:90,  panel:"ips",    ram:4},
+  {m:"POCO M7",               res:"720x1640",  inch:6.88, hz:120, panel:"ips",    ram:6},
+  {m:"POCO M7 Pro 5G",        res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"POCO X7",               res:"1220x2712", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"POCO X7 Pro",           res:"1220x2712", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"POCO F7",               res:"1280x2772", inch:6.83, hz:120, panel:"amoled", ram:12},
+  {m:"POCO F7 Pro",           res:"1440x3200", inch:6.67, hz:120, panel:"amoled", ram:12},
+  {m:"POCO F7 Ultra",         res:"1440x3200", inch:6.67, hz:120, panel:"amoled", ram:12},
+  {m:"POCO F1",               res:"1080x2246", inch:6.18, hz:60,  panel:"ips",    ram:6},
+  {m:"POCO F2 Pro",           res:"1080x2400", inch:6.67, hz:60,  panel:"amoled", ram:8},
+  {m:"POCO X2",               res:"1080x2400", inch:6.67, hz:120, panel:"ips",    ram:6},
+  {m:"POCO M2 Pro",           res:"1080x2400", inch:6.67, hz:60,  panel:"ips",    ram:4},
+  {m:"POCO M2",               res:"1080x2340", inch:6.53, hz:60,  panel:"ips",    ram:6},
+  {m:"POCO X3 GT",            res:"1080x2400", inch:6.6,  hz:120, panel:"ips",    ram:8},
 ],
 "Honor":[
   {m:"Honor 7A",            res:"720x1440",  inch:5.7,  hz:60, panel:"ips", ram:4},
@@ -3163,6 +3354,21 @@ const DB_DPI = {
   {m:"Honor Magic5 Lite",   res:"1080x2412", inch:6.78, hz:120, panel:"amoled", ram:4},
   {m:"Honor Magic6 Lite",   res:"1080x2412", inch:6.78, hz:120, panel:"amoled", ram:4},
   {m:"Honor 200 Lite",      res:"1080x2412", inch:6.7,  hz:90, panel:"amoled", ram:4},
+  {m:"Honor 8C",              res:"720x1520",  inch:6.26, hz:60,  panel:"ips",    ram:4},
+  {m:"Honor 8S",              res:"720x1520",  inch:5.71, hz:60,  panel:"ips",    ram:2},
+  {m:"Honor 9 Lite",          res:"1080x2160", inch:5.65, hz:60,  panel:"ips",    ram:3},
+  {m:"Honor 10",              res:"1080x2280", inch:5.84, hz:60,  panel:"ips",    ram:4},
+  {m:"Honor 20",              res:"1080x2340", inch:6.26, hz:60,  panel:"ips",    ram:6},
+  {m:"Honor View 20",         res:"1080x2310", inch:6.4,  hz:60,  panel:"ips",    ram:6},
+  {m:"Honor 50",              res:"1080x2340", inch:6.57, hz:120, panel:"oled",   ram:6},
+  {m:"Honor 50 Lite",         res:"1080x2376", inch:6.67, hz:60,  panel:"ips",    ram:6},
+  {m:"Honor 70",              res:"1080x2400", inch:6.67, hz:120, panel:"oled",   ram:8},
+  {m:"Honor 100",             res:"1200x2664", inch:6.7,  hz:120, panel:"amoled", ram:8},
+  {m:"Honor 200",             res:"1200x2664", inch:6.7,  hz:120, panel:"amoled", ram:8},
+  {m:"Honor 200 Pro",         res:"1200x2664", inch:6.78, hz:120, panel:"amoled", ram:12},
+  {m:"Honor Magic6 Pro",      res:"1280x2800", inch:6.8,  hz:120, panel:"oled",   ram:12},
+  {m:"Honor X5 Plus",         res:"720x1600",  inch:6.56, hz:90,  panel:"ips",    ram:4},
+  {m:"Honor X9c",             res:"1200x2664", inch:6.78, hz:120, panel:"amoled", ram:8},
 ],
 "Realme":[
   {m:"Realme C11",          res:"720x1560",  inch:6.5,  hz:60, panel:"ips", ram:4},
@@ -3192,6 +3398,28 @@ const DB_DPI = {
   {m:"Realme GT 6",         res:"1264x2780", inch:6.78, hz:120, panel:"amoled", ram:4},
   {m:"Realme Narzo 50",     res:"1080x2400", inch:6.6,  hz:90, panel:"amoled", ram:4},
   {m:"Realme Narzo 60",     res:"1080x2400", inch:6.43, hz:120, panel:"amoled", ram:4},
+  {m:"Realme 5",              res:"720x1560",  inch:6.5,  hz:60,  panel:"ips",    ram:3},
+  {m:"Realme 6",              res:"1080x2400", inch:6.5,  hz:90,  panel:"ips",    ram:6},
+  {m:"Realme 7",              res:"1080x2400", inch:6.5,  hz:90,  panel:"ips",    ram:6},
+  {m:"Realme 7 Pro",          res:"1080x2400", inch:6.4,  hz:60,  panel:"amoled", ram:8},
+  {m:"Realme 8i",             res:"1080x2412", inch:6.6,  hz:120, panel:"ips",    ram:4},
+  {m:"Realme 9i",             res:"1080x2412", inch:6.6,  hz:90,  panel:"ips",    ram:4},
+  {m:"Realme 13 Pro",         res:"1080x2412", inch:6.7,  hz:120, panel:"amoled", ram:8},
+  {m:"Realme C3",             res:"720x1560",  inch:6.5,  hz:60,  panel:"ips",    ram:3},
+  {m:"Realme C12",            res:"720x1600",  inch:6.5,  hz:60,  panel:"ips",    ram:3},
+  {m:"Realme C61",            res:"720x1600",  inch:6.74, hz:90,  panel:"ips",    ram:4},
+  {m:"Realme C63",            res:"720x1600",  inch:6.74, hz:90,  panel:"ips",    ram:6},
+  {m:"Realme C65",            res:"720x1604",  inch:6.67, hz:90,  panel:"ips",    ram:6},
+  {m:"Realme Narzo 20",       res:"720x1600",  inch:6.5,  hz:60,  panel:"ips",    ram:4},
+  {m:"Realme Narzo 30",       res:"720x1600",  inch:6.5,  hz:90,  panel:"ips",    ram:4},
+  {m:"Realme Narzo 70 Pro",   res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"Realme GT Neo 3",       res:"1080x2412", inch:6.7,  hz:120, panel:"amoled", ram:8},
+  {m:"Realme GT 5",           res:"1240x2772", inch:6.74, hz:144, panel:"amoled", ram:12},
+  {m:"Realme GT 7 Pro",       res:"1440x3168", inch:6.78, hz:120, panel:"amoled", ram:12},
+  {m:"Realme XT",             res:"1080x2340", inch:6.4,  hz:60,  panel:"amoled", ram:6},
+  {m:"Realme X2 Pro",         res:"1080x2400", inch:6.5,  hz:90,  panel:"amoled", ram:8},
+  {m:"Realme 12+",            res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"Realme 13 Pro+",        res:"1080x2412", inch:6.7,  hz:120, panel:"amoled", ram:12},
 ],
 "Motorola":[
   {m:"Moto G5",             res:"1080x1920", inch:5.0,  hz:60, panel:"amoled", ram:4},
@@ -3218,6 +3446,33 @@ const DB_DPI = {
   {m:"Edge 40",             res:"1080x2400", inch:6.55, hz:144, panel:"amoled", ram:4},
   {m:"Edge 40 Pro",         res:"1080x2400", inch:6.67, hz:165, panel:"amoled", ram:4},
   {m:"Edge 50 Pro",         res:"1220x2712", inch:6.7,  hz:144, panel:"amoled", ram:4},
+  {m:"Moto G4",               res:"1080x1920", inch:5.5,  hz:60,  panel:"ips",    ram:2},
+  {m:"Moto G13",              res:"720x1600",  inch:6.5,  hz:90,  panel:"ips",    ram:4},
+  {m:"Moto G23",              res:"720x1600",  inch:6.5,  hz:90,  panel:"ips",    ram:4},
+  {m:"Moto G53",              res:"720x1600",  inch:6.5,  hz:120, panel:"ips",    ram:4},
+  {m:"Moto G73",              res:"1080x2400", inch:6.5,  hz:120, panel:"ips",    ram:8},
+  {m:"Moto G71",              res:"1080x2400", inch:6.4,  hz:60,  panel:"amoled", ram:6},
+  {m:"Moto G60",              res:"1080x2460", inch:6.8,  hz:120, panel:"ips",    ram:6},
+  {m:"Moto G100",             res:"1080x2520", inch:6.7,  hz:90,  panel:"ips",    ram:8},
+  {m:"Moto G200",             res:"1080x2460", inch:6.8,  hz:144, panel:"ips",    ram:8},
+  {m:"Moto G05",              res:"720x1600",  inch:6.67, hz:90,  panel:"ips",    ram:4},
+  {m:"Moto G15",              res:"1080x2400", inch:6.72, hz:120, panel:"ips",    ram:4},
+  {m:"Moto G35",              res:"1080x2400", inch:6.72, hz:120, panel:"ips",    ram:4},
+  {m:"Moto G45",              res:"720x1600",  inch:6.5,  hz:120, panel:"ips",    ram:4},
+  {m:"Moto G55",              res:"1080x2400", inch:6.49, hz:120, panel:"ips",    ram:8},
+  {m:"Moto G85",              res:"1080x2400", inch:6.67, hz:120, panel:"oled",   ram:8},
+  {m:"Moto G9 Play",          res:"720x1600",  inch:6.5,  hz:60,  panel:"ips",    ram:4},
+  {m:"Moto G9 Power",         res:"720x1640",  inch:6.8,  hz:60,  panel:"ips",    ram:4},
+  {m:"Moto E7",               res:"720x1600",  inch:6.5,  hz:60,  panel:"ips",    ram:2},
+  {m:"Moto E13",              res:"720x1600",  inch:6.5,  hz:60,  panel:"ips",    ram:2},
+  {m:"Moto E20",              res:"720x1600",  inch:6.5,  hz:60,  panel:"ips",    ram:2},
+  {m:"Moto E22",              res:"720x1600",  inch:6.5,  hz:90,  panel:"ips",    ram:4},
+  {m:"Moto E32",              res:"720x1600",  inch:6.5,  hz:90,  panel:"ips",    ram:4},
+  {m:"Moto E40",              res:"720x1600",  inch:6.5,  hz:90,  panel:"ips",    ram:4},
+  {m:"Edge 40 Neo",           res:"1080x2400", inch:6.55, hz:144, panel:"oled",   ram:12},
+  {m:"Edge 50 Fusion",        res:"1080x2400", inch:6.7,  hz:144, panel:"oled",   ram:8},
+  {m:"Edge 50 Ultra",         res:"1220x2712", inch:6.7,  hz:144, panel:"oled",   ram:16},
+  {m:"Edge 50 Neo",           res:"1220x2712", inch:6.4,  hz:120, panel:"oled",   ram:12},
 ],
 "Oppo":[
   {m:"Oppo A5s",            res:"720x1520",  inch:6.2,  hz:60, panel:"ips", ram:4},
@@ -3240,6 +3495,21 @@ const DB_DPI = {
   {m:"Oppo Reno11",         res:"1080x2412", inch:6.7,  hz:120, panel:"amoled", ram:4},
   {m:"Oppo Find X5",        res:"1080x2400", inch:6.55, hz:120, panel:"amoled", ram:4},
   {m:"Oppo Find X7",        res:"1264x2780", inch:6.78, hz:120, panel:"amoled", ram:4},
+  {m:"Oppo A12",              res:"720x1520",  inch:6.22, hz:60,  panel:"ips",    ram:3},
+  {m:"Oppo A5 2020",          res:"720x1600",  inch:6.5,  hz:60,  panel:"ips",    ram:3},
+  {m:"Oppo A52",              res:"1080x2400", inch:6.5,  hz:90,  panel:"ips",    ram:4},
+  {m:"Oppo A53",              res:"720x1600",  inch:6.5,  hz:90,  panel:"ips",    ram:4},
+  {m:"Oppo A55",              res:"720x1600",  inch:6.51, hz:90,  panel:"ips",    ram:4},
+  {m:"Oppo A60",              res:"720x1604",  inch:6.67, hz:90,  panel:"ips",    ram:6},
+  {m:"Oppo A77",              res:"720x1612",  inch:6.56, hz:90,  panel:"ips",    ram:4},
+  {m:"Oppo A79",              res:"1080x2400", inch:6.72, hz:90,  panel:"ips",    ram:8},
+  {m:"Oppo A96",              res:"1080x2412", inch:6.59, hz:90,  panel:"ips",    ram:8},
+  {m:"Oppo Reno4",            res:"1080x2400", inch:6.4,  hz:90,  panel:"amoled", ram:8},
+  {m:"Oppo Reno5",            res:"1080x2400", inch:6.43, hz:90,  panel:"amoled", ram:8},
+  {m:"Oppo Reno7",            res:"1080x2400", inch:6.43, hz:90,  panel:"amoled", ram:8},
+  {m:"Oppo Reno12",           res:"1080x2412", inch:6.7,  hz:120, panel:"amoled", ram:12},
+  {m:"Oppo Find X3 Pro",      res:"1440x3216", inch:6.7,  hz:120, panel:"amoled", ram:12},
+  {m:"Oppo Find X8",          res:"1264x2780", inch:6.59, hz:120, panel:"amoled", ram:12},
 ],
 "Vivo":[
   {m:"Vivo Y11",            res:"720x1544",  inch:6.35, hz:60, panel:"ips", ram:4},
@@ -3259,6 +3529,26 @@ const DB_DPI = {
   {m:"Vivo V30",            res:"1260x2800", inch:6.78, hz:120, panel:"amoled", ram:4},
   {m:"Vivo X80",            res:"1080x2400", inch:6.78, hz:120, panel:"amoled", ram:4},
   {m:"Vivo X100",           res:"1260x2800", inch:6.78, hz:120, panel:"amoled", ram:4},
+  {m:"Vivo Y12",              res:"720x1544",  inch:6.35, hz:60,  panel:"ips",    ram:3},
+  {m:"Vivo Y17",              res:"720x1544",  inch:6.35, hz:60,  panel:"ips",    ram:4},
+  {m:"Vivo Y19",              res:"1080x2340", inch:6.53, hz:60,  panel:"ips",    ram:4},
+  {m:"Vivo Y30",              res:"720x1600",  inch:6.47, hz:60,  panel:"ips",    ram:4},
+  {m:"Vivo Y12s",             res:"720x1600",  inch:6.51, hz:60,  panel:"ips",    ram:3},
+  {m:"Vivo Y16",              res:"720x1612",  inch:6.51, hz:60,  panel:"ips",    ram:4},
+  {m:"Vivo Y02",              res:"720x1600",  inch:6.51, hz:60,  panel:"ips",    ram:2},
+  {m:"Vivo Y17s",             res:"720x1612",  inch:6.56, hz:90,  panel:"ips",    ram:4},
+  {m:"Vivo Y18",              res:"720x1612",  inch:6.56, hz:90,  panel:"ips",    ram:4},
+  {m:"Vivo Y28",              res:"720x1612",  inch:6.68, hz:90,  panel:"ips",    ram:6},
+  {m:"Vivo Y200",             res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"Vivo Y200e",            res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"Vivo V19",              res:"1080x2400", inch:6.44, hz:60,  panel:"amoled", ram:8},
+  {m:"Vivo V20",              res:"1080x2400", inch:6.44, hz:60,  panel:"amoled", ram:8},
+  {m:"Vivo V25",              res:"1080x2404", inch:6.44, hz:90,  panel:"amoled", ram:8},
+  {m:"Vivo V40",              res:"1260x2800", inch:6.78, hz:120, panel:"amoled", ram:12},
+  {m:"Vivo V50",              res:"1260x2800", inch:6.77, hz:120, panel:"amoled", ram:12},
+  {m:"Vivo X200",             res:"1260x2800", inch:6.67, hz:120, panel:"amoled", ram:12},
+  {m:"Vivo X200 Pro",         res:"1260x2800", inch:6.78, hz:120, panel:"amoled", ram:16},
+  {m:"Vivo T3",               res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
 ],
 "Huawei":[
   {m:"Huawei P8 Lite",      res:"720x1280",  inch:5.0,  hz:60, panel:"amoled", ram:4},
@@ -3276,6 +3566,29 @@ const DB_DPI = {
   {m:"Huawei Mate 40",      res:"1080x2376", inch:6.76, hz:90, panel:"amoled", ram:4},
   {m:"Huawei Mate 60",      res:"1260x2720", inch:6.69, hz:120, panel:"amoled", ram:4},
   {m:"Huawei Pura 70",      res:"1224x2700", inch:6.8,  hz:120, panel:"amoled", ram:4},
+  {m:"Huawei P Smart 2019",   res:"1080x2340", inch:6.21, hz:60,  panel:"ips",    ram:3},
+  {m:"Huawei P Smart Z",      res:"1080x2310", inch:6.59, hz:60,  panel:"ips",    ram:4},
+  {m:"Huawei Y5 2019",        res:"720x1520",  inch:5.71, hz:60,  panel:"ips",    ram:2},
+  {m:"Huawei Y6 2019",        res:"720x1560",  inch:6.09, hz:60,  panel:"ips",    ram:2},
+  {m:"Huawei Y7 2019",        res:"720x1520",  inch:6.26, hz:60,  panel:"ips",    ram:3},
+  {m:"Huawei Y9 2019",        res:"1080x2340", inch:6.5,  hz:60,  panel:"ips",    ram:4},
+  {m:"Huawei Nova 3i",        res:"1080x2340", inch:6.3,  hz:60,  panel:"ips",    ram:4},
+  {m:"Huawei Nova 7i",        res:"1080x2310", inch:6.4,  hz:60,  panel:"ips",    ram:8},
+  {m:"Huawei Nova 10",        res:"1080x2400", inch:6.67, hz:120, panel:"oled",   ram:8},
+  {m:"Huawei P20",            res:"1080x2244", inch:5.8,  hz:60,  panel:"ips",    ram:4},
+  {m:"Huawei P20 Pro",        res:"1080x2240", inch:6.1,  hz:60,  panel:"oled",   ram:6},
+  {m:"Huawei P30",            res:"1080x2340", inch:6.1,  hz:60,  panel:"oled",   ram:6},
+  {m:"Huawei P30 Pro",        res:"1080x2340", inch:6.47, hz:60,  panel:"oled",   ram:8},
+  {m:"Huawei P40",            res:"1080x2340", inch:6.1,  hz:60,  panel:"oled",   ram:8},
+  {m:"Huawei P40 Pro",        res:"1200x2640", inch:6.58, hz:90,  panel:"oled",   ram:8},
+  {m:"Huawei P50 Pro",        res:"1228x2700", inch:6.6,  hz:120, panel:"oled",   ram:8},
+  {m:"Huawei P60 Pro",        res:"1220x2700", inch:6.67, hz:120, panel:"oled",   ram:8},
+  {m:"Huawei Mate 10 Pro",    res:"1080x2160", inch:6.0,  hz:60,  panel:"oled",   ram:6},
+  {m:"Huawei Mate 20 Pro",    res:"1440x3120", inch:6.39, hz:60,  panel:"oled",   ram:6},
+  {m:"Huawei Mate 30 Pro",    res:"1176x2400", inch:6.53, hz:60,  panel:"oled",   ram:8},
+  {m:"Huawei Mate 40 Pro",    res:"1344x2772", inch:6.76, hz:90,  panel:"oled",   ram:8},
+  {m:"Huawei Mate 50 Pro",    res:"1212x2616", inch:6.74, hz:120, panel:"oled",   ram:8},
+  {m:"Huawei Pura 70 Pro",    res:"1220x2700", inch:6.8,  hz:120, panel:"oled",   ram:12},
 ],
 "OnePlus":[
   {m:"OnePlus 6",           res:"1080x2280", inch:6.28, hz:60, panel:"amoled", ram:4},
@@ -3293,6 +3606,23 @@ const DB_DPI = {
   {m:"OnePlus Nord",        res:"1080x2400", inch:6.44, hz:90, panel:"amoled", ram:4},
   {m:"OnePlus Nord CE4",    res:"1080x2376", inch:6.7,  hz:120, panel:"amoled", ram:4},
   {m:"OnePlus Nord 4",      res:"1080x2408", inch:6.74, hz:120, panel:"amoled", ram:4},
+  {m:"OnePlus 5",             res:"1080x1920", inch:5.5,  hz:60,  panel:"amoled", ram:6},
+  {m:"OnePlus 5T",            res:"1080x2160", inch:6.01, hz:60,  panel:"amoled", ram:8},
+  {m:"OnePlus 7T",            res:"1080x2400", inch:6.55, hz:90,  panel:"amoled", ram:8},
+  {m:"OnePlus 7T Pro",        res:"1440x3120", inch:6.67, hz:90,  panel:"amoled", ram:8},
+  {m:"OnePlus 8T",            res:"1080x2400", inch:6.55, hz:120, panel:"amoled", ram:8},
+  {m:"OnePlus 9R",            res:"1080x2400", inch:6.55, hz:120, panel:"amoled", ram:8},
+  {m:"OnePlus 10T",           res:"1080x2412", inch:6.7,  hz:120, panel:"amoled", ram:12},
+  {m:"OnePlus 11R",           res:"1240x2772", inch:6.74, hz:120, panel:"amoled", ram:8},
+  {m:"OnePlus 13",            res:"1440x3168", inch:6.82, hz:120, panel:"amoled", ram:12},
+  {m:"OnePlus 13R",           res:"1264x2780", inch:6.78, hz:120, panel:"amoled", ram:12},
+  {m:"OnePlus Nord 2",        res:"1080x2400", inch:6.43, hz:90,  panel:"amoled", ram:8},
+  {m:"OnePlus Nord 2T",       res:"1080x2400", inch:6.43, hz:90,  panel:"amoled", ram:8},
+  {m:"OnePlus Nord 3",        res:"1240x2772", inch:6.74, hz:120, panel:"amoled", ram:8},
+  {m:"OnePlus Nord CE 2",     res:"1080x2400", inch:6.43, hz:90,  panel:"amoled", ram:8},
+  {m:"OnePlus Nord CE 3",     res:"1080x2412", inch:6.7,  hz:120, panel:"amoled", ram:8},
+  {m:"OnePlus Nord CE 3 Lite", res:"1080x2400", inch:6.72, hz:120, panel:"ips",    ram:8},
+  {m:"OnePlus Nord CE4 Lite", res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
 ],
 "Google Pixel":[
   {m:"Pixel 3",             res:"1080x2160", inch:5.5,  hz:60, panel:"amoled", ram:4},
@@ -3305,6 +3635,24 @@ const DB_DPI = {
   {m:"Pixel 8",             res:"1080x2400", inch:6.2,  hz:120, panel:"amoled", ram:4},
   {m:"Pixel 8a",            res:"1080x2142", inch:6.1,  hz:120, panel:"amoled", ram:4},
   {m:"Pixel 9",             res:"1080x2424", inch:6.3,  hz:120, panel:"amoled", ram:4},
+  {m:"Pixel 2",               res:"1080x1920", inch:5.0,  hz:60,  panel:"amoled", ram:4},
+  {m:"Pixel 2 XL",            res:"1440x2880", inch:6.0,  hz:60,  panel:"oled",   ram:4},
+  {m:"Pixel 3 XL",            res:"1440x2960", inch:6.3,  hz:60,  panel:"oled",   ram:4},
+  {m:"Pixel 3a",              res:"1080x2220", inch:5.6,  hz:60,  panel:"oled",   ram:4},
+  {m:"Pixel 3a XL",           res:"1080x2160", inch:6.0,  hz:60,  panel:"oled",   ram:4},
+  {m:"Pixel 4 XL",            res:"1440x3040", inch:6.3,  hz:90,  panel:"oled",   ram:6},
+  {m:"Pixel 4a",              res:"1080x2340", inch:5.81, hz:60,  panel:"oled",   ram:6},
+  {m:"Pixel 4a 5G",           res:"1080x2340", inch:6.2,  hz:60,  panel:"oled",   ram:6},
+  {m:"Pixel 5a",              res:"1080x2400", inch:6.34, hz:60,  panel:"oled",   ram:6},
+  {m:"Pixel 6 Pro",           res:"1440x3120", inch:6.71, hz:120, panel:"oled",   ram:12},
+  {m:"Pixel 7 Pro",           res:"1440x3120", inch:6.7,  hz:120, panel:"oled",   ram:12},
+  {m:"Pixel 8 Pro",           res:"1344x2992", inch:6.7,  hz:120, panel:"oled",   ram:12},
+  {m:"Pixel 9 Pro",           res:"1280x2856", inch:6.3,  hz:120, panel:"oled",   ram:16},
+  {m:"Pixel 9 Pro XL",        res:"1344x2992", inch:6.8,  hz:120, panel:"oled",   ram:16},
+  {m:"Pixel 9a",              res:"1080x2424", inch:6.3,  hz:120, panel:"oled",   ram:8},
+  {m:"Pixel 10",              res:"1080x2424", inch:6.3,  hz:120, panel:"oled",   ram:12},
+  {m:"Pixel 10 Pro",          res:"1280x2856", inch:6.3,  hz:120, panel:"oled",   ram:16},
+  {m:"Pixel 10 Pro XL",       res:"1344x2992", inch:6.8,  hz:120, panel:"oled",   ram:16},
 ],
 "Sony":[
   {m:"Xperia XA",           res:"720x1280",  inch:5.0,  hz:60, panel:"amoled", ram:4},
@@ -3316,6 +3664,18 @@ const DB_DPI = {
   {m:"Xperia 1 IV",         res:"1644x3840", inch:6.5,  hz:120, panel:"amoled", ram:4},
   {m:"Xperia 5 IV",         res:"1080x2520", inch:6.1,  hz:120, panel:"amoled", ram:4},
   {m:"Xperia 1 V",          res:"1080x2520", inch:6.1,  hz:120, panel:"amoled", ram:4},
+  {m:"Xperia Z3",             res:"1080x1920", inch:5.2,  hz:60,  panel:"ips",    ram:3},
+  {m:"Xperia XZ",             res:"1080x1920", inch:5.2,  hz:60,  panel:"ips",    ram:3},
+  {m:"Xperia XZ1",            res:"1080x1920", inch:5.2,  hz:60,  panel:"ips",    ram:4},
+  {m:"Xperia XZ2",            res:"1080x2160", inch:5.7,  hz:60,  panel:"ips",    ram:4},
+  {m:"Xperia XZ3",            res:"1440x2880", inch:6.0,  hz:60,  panel:"oled",   ram:4},
+  {m:"Xperia 10",             res:"1080x2520", inch:6.0,  hz:60,  panel:"ips",    ram:3},
+  {m:"Xperia 5",              res:"1080x2520", inch:6.1,  hz:60,  panel:"oled",   ram:6},
+  {m:"Xperia 5 II",           res:"1080x2520", inch:6.1,  hz:120, panel:"oled",   ram:8},
+  {m:"Xperia 5 III",          res:"1080x2520", inch:6.1,  hz:120, panel:"oled",   ram:8},
+  {m:"Xperia 5 V",            res:"1080x2520", inch:6.1,  hz:120, panel:"oled",   ram:8},
+  {m:"Xperia 1 VI",           res:"1080x2340", inch:6.5,  hz:120, panel:"oled",   ram:12},
+  {m:"Xperia 10 VI",          res:"1080x2520", inch:6.1,  hz:60,  panel:"oled",   ram:8},
 ],
 "Sony Ericsson":[
   {m:"Xperia Arc",          res:"480x854",   inch:4.2,  hz:60, panel:"amoled", ram:4},
@@ -3334,6 +3694,19 @@ const DB_DPI = {
   {m:"ROG Phone 6",         res:"1080x2448", inch:6.78, hz:165, panel:"amoled", ram:4},
   {m:"ROG Phone 7",         res:"1080x2448", inch:6.78, hz:165, panel:"amoled", ram:4},
   {m:"ROG Phone 8",         res:"1080x2400", inch:6.78, hz:165, panel:"amoled", ram:4},
+  {m:"ROG Phone",             res:"1080x2160", inch:6.0,  hz:90,  panel:"amoled", ram:8},
+  {m:"ROG Phone II",          res:"1080x2340", inch:6.59, hz:120, panel:"amoled", ram:12},
+  {m:"ROG Phone 3",           res:"1080x2340", inch:6.59, hz:144, panel:"amoled", ram:12},
+  {m:"ROG Phone 5s",          res:"1080x2448", inch:6.78, hz:144, panel:"amoled", ram:16},
+  {m:"Zenfone 5",             res:"1080x2246", inch:6.2,  hz:60,  panel:"ips",    ram:4},
+  {m:"Zenfone 6",             res:"1080x2340", inch:6.4,  hz:60,  panel:"ips",    ram:6},
+  {m:"Zenfone 7",             res:"1080x2400", inch:6.67, hz:90,  panel:"amoled", ram:6},
+  {m:"Zenfone 8 Flip",        res:"1080x2400", inch:6.67, hz:90,  panel:"amoled", ram:8},
+  {m:"Zenfone 11 Ultra",      res:"1080x2400", inch:6.78, hz:120, panel:"amoled", ram:12},
+  {m:"Zenfone Max M1",        res:"720x1440",  inch:5.5,  hz:60,  panel:"ips",    ram:3},
+  {m:"Zenfone Max M2",        res:"720x1520",  inch:6.26, hz:60,  panel:"ips",    ram:4},
+  {m:"Zenfone Max Pro M1",    res:"1080x2160", inch:6.0,  hz:60,  panel:"ips",    ram:4},
+  {m:"Zenfone Max Pro M2",    res:"1080x2280", inch:6.3,  hz:60,  panel:"ips",    ram:6},
 ],
 "Lenovo":[
   {m:"K6 Note",             res:"1080x1920", inch:5.5,  hz:60, panel:"amoled", ram:4},
@@ -3341,6 +3714,8 @@ const DB_DPI = {
   {m:"Legion Phone 2 Pro",  res:"1080x2460", inch:6.92, hz:144, panel:"amoled", ram:4},
   {m:"Legion Phone 3 Pro",  res:"1080x2460", inch:6.92, hz:144, panel:"amoled", ram:4},
   {m:"Tab M10",             res:"1200x1920", inch:10.1, hz:60, panel:"amoled", ram:4},
+  {m:"K10 Note",              res:"1080x2340", inch:6.3,  hz:60,  panel:"ips",    ram:6},
+  {m:"Legion Y70",            res:"1080x2400", inch:6.67, hz:144, panel:"amoled", ram:8},
 ],
 "Nokia":[
   {m:"Nokia 2.2",           res:"720x1520",  inch:5.71, hz:60, panel:"amoled", ram:4},
@@ -3349,6 +3724,16 @@ const DB_DPI = {
   {m:"Nokia G21",           res:"720x1600",  inch:6.5,  hz:90, panel:"amoled", ram:4},
   {m:"Nokia G22",           res:"720x1600",  inch:6.52, hz:90, panel:"amoled", ram:4},
   {m:"Nokia X30",           res:"1080x2400", inch:6.43, hz:90, panel:"amoled", ram:4},
+  {m:"Nokia 6.1",             res:"1080x2160", inch:5.5,  hz:60,  panel:"ips",    ram:3},
+  {m:"Nokia 7.2",             res:"1080x2280", inch:6.3,  hz:60,  panel:"ips",    ram:4},
+  {m:"Nokia 5.4",             res:"720x1560",  inch:6.39, hz:60,  panel:"ips",    ram:4},
+  {m:"Nokia G10",             res:"720x1560",  inch:6.52, hz:60,  panel:"ips",    ram:3},
+  {m:"Nokia G11",             res:"720x1600",  inch:6.5,  hz:90,  panel:"ips",    ram:3},
+  {m:"Nokia G20",             res:"720x1600",  inch:6.52, hz:60,  panel:"ips",    ram:4},
+  {m:"Nokia X10",             res:"1080x2400", inch:6.67, hz:60,  panel:"ips",    ram:6},
+  {m:"Nokia X20",             res:"1080x2400", inch:6.67, hz:60,  panel:"ips",    ram:6},
+  {m:"Nokia 8.3",             res:"1080x2400", inch:6.81, hz:60,  panel:"ips",    ram:8},
+  {m:"Nokia C30",             res:"720x1600",  inch:6.82, hz:60,  panel:"ips",    ram:2},
 ],
 "LG":[
   {m:"LG G4",               res:"1440x2560", inch:5.5,  hz:60, panel:"amoled", ram:4},
@@ -3358,6 +3743,17 @@ const DB_DPI = {
   {m:"LG Q70",              res:"1080x2310", inch:6.4,  hz:60, panel:"amoled", ram:4},
   {m:"LG Velvet",           res:"1080x2460", inch:6.8,  hz:60, panel:"amoled", ram:4},
   {m:"LG Wing",             res:"1080x2460", inch:6.8,  hz:60, panel:"amoled", ram:4},
+  {m:"LG G3",                 res:"1440x2560", inch:5.5,  hz:60,  panel:"ips",    ram:3},
+  {m:"LG G7 ThinQ",           res:"1440x3120", inch:6.1,  hz:60,  panel:"ips",    ram:4},
+  {m:"LG G8 ThinQ",           res:"1440x3120", inch:6.1,  hz:60,  panel:"oled",   ram:6},
+  {m:"LG V40",                res:"1440x3120", inch:6.4,  hz:60,  panel:"oled",   ram:6},
+  {m:"LG V50",                res:"1440x3120", inch:6.4,  hz:60,  panel:"oled",   ram:6},
+  {m:"LG V60",                res:"1080x2460", inch:6.8,  hz:60,  panel:"oled",   ram:8},
+  {m:"LG K50",                res:"720x1520",  inch:6.26, hz:60,  panel:"ips",    ram:3},
+  {m:"LG K51",                res:"720x1560",  inch:6.5,  hz:60,  panel:"ips",    ram:3},
+  {m:"LG K61",                res:"1080x2340", inch:6.53, hz:60,  panel:"ips",    ram:4},
+  {m:"LG Q60",                res:"720x1560",  inch:6.26, hz:60,  panel:"ips",    ram:3},
+  {m:"LG Q6",                 res:"1080x2160", inch:5.5,  hz:60,  panel:"ips",    ram:3},
 ],
 "HTC":[
   {m:"HTC One M8",          res:"1080x1920", inch:5.0,  hz:60, panel:"amoled", ram:4},
@@ -3365,6 +3761,7 @@ const DB_DPI = {
   {m:"HTC U11",             res:"1440x2560", inch:5.5,  hz:60, panel:"amoled", ram:4},
   {m:"HTC U12+",            res:"1440x2880", inch:6.0,  hz:60, panel:"amoled", ram:4},
   {m:"HTC Desire 21 Pro",   res:"1080x2376", inch:6.7,  hz:90, panel:"amoled", ram:4},
+  {m:"HTC Desire 20 Pro",     res:"1080x2340", inch:6.5,  hz:60,  panel:"ips",    ram:6},
 ],
 "Infinix":[
   {m:"Hot 10",              res:"720x1600",  inch:6.78, hz:60, panel:"amoled", ram:4},
@@ -3383,6 +3780,26 @@ const DB_DPI = {
   {m:"Smart 7",             res:"720x1640",  inch:6.6,  hz:60, panel:"amoled", ram:4},
   {m:"Smart 8",             res:"720x1600",  inch:6.6,  hz:90, panel:"amoled", ram:4},
   {m:"Zero 30",             res:"1080x2400", inch:6.78, hz:144, panel:"amoled", ram:4},
+  {m:"Hot 8",                 res:"720x1560",  inch:6.52, hz:60,  panel:"ips",    ram:2},
+  {m:"Hot 9",                 res:"720x1600",  inch:6.6,  hz:60,  panel:"ips",    ram:3},
+  {m:"Hot 9 Play",            res:"720x1600",  inch:6.82, hz:60,  panel:"ips",    ram:2},
+  {m:"Hot 10 Play",           res:"720x1640",  inch:6.82, hz:60,  panel:"ips",    ram:3},
+  {m:"Hot 10 Lite",           res:"720x1560",  inch:6.6,  hz:60,  panel:"ips",    ram:2},
+  {m:"Hot 11S",               res:"720x1640",  inch:6.78, hz:90,  panel:"ips",    ram:4},
+  {m:"Hot 12 Play",           res:"720x1600",  inch:6.82, hz:60,  panel:"ips",    ram:4},
+  {m:"Hot 12i",               res:"720x1612",  inch:6.6,  hz:60,  panel:"ips",    ram:4},
+  {m:"Hot 30 Play",           res:"720x1612",  inch:6.82, hz:90,  panel:"ips",    ram:4},
+  {m:"Hot 30i",               res:"720x1612",  inch:6.6,  hz:60,  panel:"ips",    ram:4},
+  {m:"Hot 50",                res:"720x1612",  inch:6.78, hz:120, panel:"ips",    ram:8},
+  {m:"Hot 50 Pro",            res:"1080x2436", inch:6.78, hz:120, panel:"amoled", ram:8},
+  {m:"Hot 50i",               res:"720x1612",  inch:6.78, hz:90,  panel:"ips",    ram:4},
+  {m:"Note 7",                res:"720x1640",  inch:6.95, hz:60,  panel:"ips",    ram:4},
+  {m:"Note 8",                res:"720x1640",  inch:6.95, hz:60,  panel:"ips",    ram:4},
+  {m:"Note 12 Pro",           res:"1080x2400", inch:6.7,  hz:120, panel:"amoled", ram:8},
+  {m:"Note 30 Pro",           res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
+  {m:"Smart 6",               res:"720x1600",  inch:6.6,  hz:60,  panel:"ips",    ram:2},
+  {m:"Smart 9",               res:"720x1612",  inch:6.67, hz:90,  panel:"ips",    ram:4},
+  {m:"GT 20 Pro",             res:"1080x2436", inch:6.78, hz:144, panel:"amoled", ram:12},
 ],
 "Tecno":[
   {m:"Spark 6",             res:"720x1640",  inch:6.8,  hz:60, panel:"amoled", ram:4},
@@ -3398,6 +3815,18 @@ const DB_DPI = {
   {m:"Pova 4",              res:"720x1640",  inch:6.82, hz:90, panel:"amoled", ram:4},
   {m:"Pova 5",              res:"1080x2460", inch:6.78, hz:90, panel:"amoled", ram:4},
   {m:"Pova 6",              res:"1080x2460", inch:6.78, hz:120, panel:"amoled", ram:4},
+  {m:"Spark 5",               res:"720x1600",  inch:6.6,  hz:60,  panel:"ips",    ram:2},
+  {m:"Spark 9",               res:"720x1612",  inch:6.6,  hz:90,  panel:"ips",    ram:4},
+  {m:"Spark 10 Pro",          res:"1080x2460", inch:6.8,  hz:90,  panel:"ips",    ram:8},
+  {m:"Spark Go 2023",         res:"720x1600",  inch:6.56, hz:90,  panel:"ips",    ram:3},
+  {m:"Spark Go 2024",         res:"720x1612",  inch:6.56, hz:90,  panel:"ips",    ram:4},
+  {m:"Spark 20C",             res:"720x1612",  inch:6.56, hz:90,  panel:"ips",    ram:4},
+  {m:"Spark 30",              res:"720x1612",  inch:6.78, hz:120, panel:"ips",    ram:8},
+  {m:"Phantom X2",            res:"1080x2400", inch:6.8,  hz:120, panel:"amoled", ram:8},
+  {m:"Pova 3",                res:"720x1640",  inch:6.9,  hz:90,  panel:"ips",    ram:6},
+  {m:"Pova 6 Pro",            res:"1080x2436", inch:6.78, hz:120, panel:"amoled", ram:8},
+  {m:"Pop 5",                 res:"720x1560",  inch:6.52, hz:60,  panel:"ips",    ram:2},
+  {m:"Pop 7",                 res:"720x1612",  inch:6.56, hz:60,  panel:"ips",    ram:2},
 ],
 "Itel":[
   {m:"Itel P37",            res:"720x1440",  inch:6.0,  hz:60, panel:"amoled", ram:4},
@@ -3441,6 +3870,11 @@ const DB_DPI = {
   {m:"TCL 30",              res:"720x1600",  inch:6.52, hz:60, panel:"amoled", ram:4},
   {m:"TCL 40 SE",           res:"720x1640",  inch:6.75, hz:60, panel:"amoled", ram:4},
   {m:"TCL 40 NxtPaper",     res:"1080x2400", inch:6.78, hz:60, panel:"amoled", ram:4},
+  {m:"TCL 10L",               res:"1080x2340", inch:6.53, hz:60,  panel:"ips",    ram:6},
+  {m:"TCL 10 Pro",            res:"1080x2340", inch:6.47, hz:60,  panel:"amoled", ram:6},
+  {m:"TCL 20 Pro 5G",         res:"1080x2400", inch:6.67, hz:60,  panel:"amoled", ram:6},
+  {m:"TCL 20 S",              res:"1080x2400", inch:6.67, hz:60,  panel:"ips",    ram:6},
+  {m:"TCL 30 SE",             res:"720x1600",  inch:6.52, hz:60,  panel:"ips",    ram:4},
 ],
 "Sharp":[
   {m:"Sharp Aquos R7",      res:"1260x2730", inch:6.4,  hz:240, panel:"amoled", ram:4},
@@ -3453,12 +3887,22 @@ const DB_DPI = {
   {m:"Nubia Red Magic 8",   res:"1080x2480", inch:6.8,  hz:165, panel:"amoled", ram:4},
   {m:"Nubia Red Magic 9",   res:"1080x2480", inch:6.8,  hz:165, panel:"amoled", ram:4},
   {m:"Nubia Z50",           res:"1080x2480", inch:6.67, hz:120, panel:"amoled", ram:4},
+  {m:"Nubia Red Magic 3",     res:"1080x2340", inch:6.65, hz:90,  panel:"amoled", ram:8},
+  {m:"Nubia Red Magic 5G",    res:"1080x2340", inch:6.65, hz:90,  panel:"amoled", ram:8},
+  {m:"Nubia Red Magic 5S",    res:"1080x2340", inch:6.65, hz:144, panel:"amoled", ram:8},
+  {m:"Nubia Red Magic 6",     res:"1080x2400", inch:6.8,  hz:165, panel:"amoled", ram:8},
+  {m:"Nubia Red Magic 6 Pro", res:"1080x2400", inch:6.8,  hz:165, panel:"amoled", ram:12},
+  {m:"Nubia Red Magic 8 Pro", res:"1116x2480", inch:6.8,  hz:120, panel:"amoled", ram:12},
+  {m:"Nubia Red Magic 9 Pro", res:"1116x2480", inch:6.8,  hz:120, panel:"amoled", ram:12},
+  {m:"Nubia Z60 Ultra",       res:"1116x2480", inch:6.8,  hz:120, panel:"amoled", ram:12},
 ],
 "ZTE":[
   {m:"Blade A52",           res:"720x1600",  inch:6.52, hz:60, panel:"amoled", ram:4},
   {m:"Blade A72",           res:"720x1600",  inch:6.74, hz:90, panel:"amoled", ram:4},
   {m:"Blade V41 Vita",      res:"720x1600",  inch:6.75, hz:90, panel:"amoled", ram:4},
   {m:"Axon 40 Ultra",       res:"1080x2480", inch:6.8,  hz:120, panel:"amoled", ram:4},
+  {m:"Axon 7",                res:"1440x2560", inch:5.5,  hz:60,  panel:"amoled", ram:4},
+  {m:"Axon 30 Ultra",         res:"1080x2400", inch:6.67, hz:120, panel:"amoled", ram:8},
 ],
 "Coolpad":[
   {m:"Coolpad CP12",        res:"720x1600",  inch:6.52, hz:60, panel:"amoled", ram:4},
@@ -3483,32 +3927,44 @@ function dpiCambiarMarca(){
   document.getElementById("dpiModeloSelLabel").style.display = "none";
   document.getElementById("dpiResultBox").style.display = "none";
   // Precargar lista si hay marca
-  if(marca) _dpiMostrarLista(marca, "");
+  if(marca) requestAnimationFrame(function(){ _dpiMostrarLista(marca, ""); }); // después de cerrar el selector
 }
 
 function dpiFiltraModelos(){
   const marca = document.getElementById("dpiMarca").value;
   const q = document.getElementById("dpiModeloBuscar").value.toLowerCase().trim();
   if(!marca){ alert("Selecciona primero la marca"); return; }
-  _dpiMostrarLista(marca, q);
+  clearTimeout(window._dpiBuscaT);
+  window._dpiBuscaT = setTimeout(function(){ _dpiMostrarLista(marca, q); }, 90); // sin trabarse al escribir
 }
 
+let _dpiListaActual = [];
+function _dpiNorm(t){ return String(t).toLowerCase().replace(/[^a-z0-9]/g, ""); }
 function _dpiMostrarLista(marca, q){
   const lista = document.getElementById("dpiListaModelos");
-  const modelos = DB_DPI[marca] || [];
-  const filtrados = q ? modelos.filter(d=>d.m.toLowerCase().includes(q)) : modelos;
-
+  // Orden natural (A03, A04… S24) y búsqueda sin importar espacios ni guiones ("s24" → "Galaxy S24")
+  const base = (DB_DPI[marca] || []).slice().sort((x, y) => x.m.localeCompare(y.m, undefined, {numeric:true, sensitivity:"base"}));
+  const qn = _dpiNorm(q || "");
+  const filtrados = qn ? base.filter(d => _dpiNorm(d.m).indexOf(qn) !== -1) : base;
+  _dpiListaActual = filtrados;
   if(filtrados.length === 0){
-    lista.innerHTML = '<div class="dpi-no-results">Sin resultados para "'+q+'"</div>';
+    lista.innerHTML = '<div class="dpi-no-results"></div>';
+    lista.firstChild.textContent = 'Sin resultados para "' + q + '"';
     lista.style.display = "block";
     return;
   }
-
-  lista.innerHTML = filtrados.map(d=>`
-    <div class="dpi-lista-item" onclick='_dpiSeleccionar(${JSON.stringify(d)})'>
-      <span>${d.m}</span>
-      <span class="dpi-item-sub">${d.res} · ${d.hz}Hz · ${d.inch}"</span>
-    </div>`).join("");
+  // Solo se pintan 40 a la vez (antes se creaban cientos de filas con el modelo entero
+  // dentro del onclick, y eso retrasaba el selector de marca); el clic usa delegación.
+  const MAX = 40;
+  const vis = filtrados.slice(0, MAX);
+  let html = "";
+  for(let i = 0; i < vis.length; i++){
+    const d = vis[i];
+    html += '<div class="dpi-lista-item" data-i="' + i + '"><span>' + d.m + '</span><span class="dpi-item-sub">' + d.res + ' · ' + d.hz + 'Hz · ' + d.inch + '"</span></div>';
+  }
+  if(filtrados.length > MAX) html += '<div class="dpi-no-results">Mostrando ' + MAX + ' de ' + filtrados.length + ' · escribe para filtrar</div>';
+  lista.innerHTML = html;
+  lista.scrollTop = 0;
   lista.style.display = "block";
 }
 
@@ -3565,38 +4021,49 @@ function _calcDpiReal(w, h, inch){
 }
 
 // Calibración DPI por nivel + hz + grupo táctil
-function _factorFF(hz, dpiReal, grp, mod, sjG, sjR, sjB){
-  let rMin, rMax;
-  if(mod === "high")     { rMin=520; rMax=560; }
-  else if(mod === "mid") { rMin=440; rMax=518; }
-  else if(mod === "low") { rMin=350; rMax=438; }
-  else {
-    const pct = Math.min(Math.max((dpiReal-200)/380, 0), 1);
-    if(pct < 0.35)      { rMin=350; rMax=438; }
-    else if(pct < 0.70) { rMin=440; rMax=518; }
-    else                { rMin=520; rMax=560; }
+// Calibración DPI DETERMINISTA: los mismos datos dan siempre el mismo DPI
+// (antes sorteaba un valor al azar dentro del rango en cada toque, y el Punto Rojo
+// y el grupo del teléfono se ignoraban).
+//  · "DPI Normal": curva continua según densidad de pantalla (65 %), Hz (25 %) y panel (10 %).
+//  · Nivel Bajo/Medio/Alto elegido: posición dentro de ese rango.
+//  · En ambos casos se afina con la calidad táctil del grupo y tu sensibilidad real en el juego
+//    (General, relación Rojo/General y Botón de disparo).
+function _calibrarDpi(hz, dpiReal, grp, mod, sjG, sjR, sjB, panel){
+  const pctDens = clamp((dpiReal - 200) / 380, 0, 1);
+  const pctHz   = clamp((hz - 60) / 84, 0, 1);
+  const pnl     = (panel === "amoled" || panel === "oled") ? 1 : panel === "lcd" ? 0 : 0.5;
+  // Ajustes que dependen del grupo de teléfono y de tu sensibilidad real en el juego (en "unidades de posición")
+  let aj = ({A:0.04, E:0.03, B2:0.01, B4:0.01, C:-0.05}[grp] || 0);          // calidad táctil por grupo
+  const g = (sjG >= 1 && sjG <= 200) ? sjG : ((sjR >= 1 && sjR <= 200) ? sjR : 0);
+  if(g) aj += ((g - 85) / 115 - 0.5) * 0.35;                                  // General alto → DPI más alto
+  if(sjG >= 1 && sjR >= 1) aj += clamp(sjR - sjG, -10, 10) / 10 * 0.06;       // Rojo por encima de General
+  if(sjB >= 27 && sjB <= 57) aj += clamp((40 - sjB) / 13, -1, 1) * 0.10;      // Botón bajo → DPI más alto
+  let dpi, nivel;
+  if(mod === "low" || mod === "mid" || mod === "high"){
+    // Nivel elegido por el usuario: la posición dentro de SU rango sube con densidad, Hz y panel
+    nivel = mod;
+    const rMin = nivel === "high" ? 520 : nivel === "mid" ? 440 : 350;
+    const rMax = nivel === "high" ? 560 : nivel === "mid" ? 518 : 438;
+    let t = 0.5 + (pctDens - 0.5) * 0.35 + (pctHz - 0.4) * 0.25 + (pnl - 0.5) * 0.12 + aj;
+    t = clamp(t, 0.03, 0.97);
+    dpi = clamp(Math.round((rMin + t * (rMax - rMin)) / 2) * 2, rMin, rMax);
+  } else {
+    // "DPI Normal": puntaje continuo (densidad 65 % + Hz 25 % + panel 10 %) → curva por tramos.
+    // Es continua: dos teléfonos casi iguales ya no saltan de un nivel a otro por un umbral.
+    const comp = pctDens * 0.65 + pctHz * 0.25 + pnl * 0.10;
+    const base = comp <= 0.36 ? 350 + comp / 0.36 * 90
+               : comp <= 0.72 ? 440 + (comp - 0.36) / 0.36 * 80
+               :                520 + (comp - 0.72) / 0.28 * 40;
+    dpi = clamp(Math.round((base + aj * 80) / 2) * 2, 350, 560);
+    nivel = dpi < 440 ? "low" : dpi < 520 ? "mid" : "high";
   }
-  // Ajuste hz dentro del rango
-  if(hz >= 144) rMin = Math.min(rMin + Math.round((rMax-rMin)*0.15), rMax-10);
-  else if(hz >= 120) rMin = Math.min(rMin + Math.round((rMax-rMin)*0.10), rMax-10);
-  else if(hz >= 90)  rMin = Math.min(rMin + Math.round((rMax-rMin)*0.05), rMax-10);
-  // Refinamiento con sensibilidad real del juego (si se proveyó)
-  if(sjG && sjG >= 1 && sjG <= 200){
-    // General alto en FF → el usuario necesita DPI más alto para ese control
-    // General bajo → DPI más bajo
-    const gPct = (sjG - 85) / 115; // 0 = bajo (85), 1 = alto (200)
-    const gShift = Math.round((gPct - 0.5) * (rMax - rMin) * 0.3);
-    rMin = clamp(rMin + gShift, rMin - 10, rMax - 10);
-  }
-  if(sjB && sjB >= 27 && sjB <= 57){
-    // Botón bajo = reacción rápida = DPI puede ser más alto
-    // Botón alto = DPI más bajo para compensar
-    const bShift = Math.round(((40 - sjB) / 30) * (rMax - rMin) * 0.15);
-    rMin = clamp(rMin + bShift, rMin - 8, rMax - 8);
-  }
-  // Aleatorio en pasos de 2
-  const steps = Math.floor((rMax - rMin) / 2);
-  return clamp(rMin + Math.floor(Math.random() * (steps+1)) * 2, rMin, rMax);
+  const lo = nivel === "high" ? 520 : nivel === "mid" ? 440 : 350;
+  const hi = nivel === "high" ? 560 : nivel === "mid" ? 518 : 438;
+  return { dpi: dpi, nivel: nivel, lo: clamp(dpi - 14, lo, hi), hi: clamp(dpi + 14, lo, hi) };
+}
+// Compatibilidad: devuelve solo el número
+function _factorFF(hz, dpiReal, grp, mod, sjG, sjR, sjB, panel){
+  return _calibrarDpi(hz, dpiReal, grp, mod, sjG, sjR, sjB, panel).dpi;
 }
 
 function calcularDpi(){
@@ -3629,7 +4096,10 @@ function calcularDpi(){
 
   const dpiReal  = _calcDpiReal(w, h, inch);
   const grp      = _grp(marca||"");
-  const dpiFinal = _factorFF(hzVal, dpiReal, grp, mod, sjG, sjR, sjB);
+  // Panel: el del modelo elegido (si hay) o el típico del grupo
+  const panelDpi = (_dpiModeloActual && _dpiModeloActual.panel) || ({A:"amoled", B2:"amoled", E:"oled", C:"lcd"}[grp] || "ips");
+  const cal      = _calibrarDpi(hzVal, dpiReal, grp, mod, sjG, sjR, sjB, panelDpi);
+  const dpiFinal = cal.dpi;
 
   // Categoría y tip
   let tipText;
@@ -3642,7 +4112,7 @@ function calcularDpi(){
   // Badges
   const autoBadge = _dpiModeloActual
     ? '<span class="dpi-auto-badge">✔ AUTO DETECTADO</span> ' : "";
-  const modBadge = parseInt(mod) > 0
+  const modBadge = (mod && mod !== "0")
     ? '<span class="dpi-mod-badge">☠️ MODIFICADO</span>' : "";
 
   document.getElementById("dpiValor").textContent = dpiFinal;
@@ -3650,11 +4120,12 @@ function calcularDpi(){
   document.getElementById("dpiSubtitle").textContent =
     w+"×"+h+" · "+hzVal+"Hz · "+inch+'"' + sensiExtra + '  →  DPI físico: '+dpiReal;
   document.getElementById("dpiTip").innerHTML =
-    autoBadge + modBadge + "<br>" + tipText;
+    autoBadge + modBadge + "<br>" + tipText +
+    "<br>Rango seguro: <b>" + cal.lo + "–" + cal.hi + "</b> · Nivel: " + ({low:"BAJO", mid:"MEDIO", high:"ALTO"}[cal.nivel]);
 
   // Barras de nivel
   const total = 8;
-  const filled = Math.round(((dpiFinal-437)/(560-437)) * total);
+  const filled = Math.max(1, Math.round(((dpiFinal-350)/(560-350)) * total)); // el rango real empieza en 350
   let barsHTML = "";
   for(let i=0;i<total;i++){
     let cls = "";
@@ -3943,10 +4414,10 @@ function instalarSistema(){
   const m=document.createElement("div");
   m.id="_iModal";
   m.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;";
-  m.innerHTML="<div style='background:linear-gradient(148deg,#0A1A3E,#03070D);border:1px solid rgba(var(--a-rgb),0.3);border-radius:24px;padding:30px 24px;max-width:340px;width:100%;text-align:center;font-family:Rajdhani,sans-serif;'>"
+  m.innerHTML="<div style='background:linear-gradient(148deg,rgb(var(--n2-rgb)),rgb(var(--n0-rgb)));border:1px solid rgba(var(--a-rgb),0.3);border-radius:24px;padding:30px 24px;max-width:340px;width:100%;text-align:center;font-family:Rajdhani,sans-serif;'>"
     +"<div style='font-family:Nunito,sans-serif;font-size:17px;font-weight:900;color:var(--a);margin-bottom:4px;letter-spacing:3px;'>INSTALAR SENSIS FF</div>"
     +"<div style='font-size:11px;color:rgba(var(--a-rgb),0.5);margin-bottom:18px;letter-spacing:3px;'>AÑADIR A PANTALLA DE INICIO</div>"
-    +"<div style='font-size:14px;font-weight:600;color:#E4F2FF;line-height:2;text-align:left;background:rgba(var(--a-rgb),0.06);border-radius:14px;padding:14px 16px;margin-bottom:18px;'>"+steps+"</div>"
+    +"<div style='font-size:14px;font-weight:600;color:rgb(var(--text-rgb));line-height:2;text-align:left;background:rgba(var(--a-rgb),0.06);border-radius:14px;padding:14px 16px;margin-bottom:18px;'>"+steps+"</div>"
     +'<button onclick="document.getElementById(\'_iModal\').remove()" style="width:100%;padding:13px;background:linear-gradient(180deg,var(--a),var(--b));border:none;border-radius:14px;color:#fff;font-family:Nunito,sans-serif;font-size:13px;font-weight:900;letter-spacing:2px;cursor:pointer;">ENTENDIDO</button>'
     +"</div>";
   document.body.appendChild(m);
@@ -4042,7 +4513,7 @@ if('serviceWorker' in navigator){
       banner.style.display = 'block';
       banner.textContent = '↕ Suelta para actualizar...';
       banner.style.background = 'linear-gradient(90deg,#00C85A,#3DFF8F)';
-      banner.style.color = '#03070D';
+      banner.style.color = 'rgb(var(--n0-rgb))';
     }
   }, {passive:true});
 
@@ -4402,8 +4873,8 @@ document.addEventListener('visibilitychange', function(){
   color:#3DFF8F;text-shadow:0 0 10px rgba(0,220,100,0.55);
 }
 .nivel-media{
-  background:rgba(56,190,255,0.10);border:1.5px solid rgba(56,190,255,0.35);
-  color:#38BEFF;text-shadow:0 0 10px rgba(56,190,255,0.55);
+  background:rgba(var(--a-rgb),0.10);border:1.5px solid rgba(var(--a-rgb),0.35);
+  color:var(--a);text-shadow:0 0 10px rgba(var(--a-rgb),0.55);
 }
 .nivel-alta{
   background:rgba(255,50,50,0.10);border:1.5px solid rgba(255,50,50,0.35);
@@ -4446,22 +4917,22 @@ document.addEventListener('visibilitychange', function(){
    Blur moderado (8-10px) solo en el panel y los overlays; las tarjetas internas
    usan fondo translúcido + sombras (sin blur anidado) para no trabar la app. */
 .panel{
-  background:linear-gradient(145deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.03) 45%,rgba(255,255,255,0.06) 100%),rgba(6,16,40,0.55);
-  -webkit-backdrop-filter:blur(8px) saturate(1.3);backdrop-filter:blur(8px) saturate(1.3);
+  background:linear-gradient(145deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.03) 45%,rgba(255,255,255,0.06) 100%),rgba(var(--n1-rgb),0.55);
+  -webkit-backdrop-filter:blur(6px) saturate(1.3);backdrop-filter:blur(6px) saturate(1.3);
   border:1px solid rgba(255,255,255,0.14);
   box-shadow:0 20px 50px rgba(0,0,0,0.45),0 6px 16px rgba(var(--d-rgb),0.28),inset 0 1px 0 rgba(255,255,255,0.22),inset 0 -1px 0 rgba(255,255,255,0.05);
 }
 .result-box{
-  background:linear-gradient(148deg,rgba(255,255,255,0.08) 0%,rgba(255,255,255,0.02) 100%),rgba(4,14,45,0.55);
+  background:linear-gradient(148deg,rgba(255,255,255,0.08) 0%,rgba(255,255,255,0.02) 100%),rgba(var(--n1-rgb),0.55);
   border:1px solid rgba(255,255,255,0.13);
   box-shadow:0 10px 30px rgba(0,0,0,0.4),0 2px 8px rgba(var(--d-rgb),0.3),inset 0 1px 0 rgba(255,255,255,0.18);
 }
 .combo-card,.hud-card,.dpi-result-card{
-  background:linear-gradient(145deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02)),rgba(6,18,50,0.45);
+  background:linear-gradient(145deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02)),rgba(var(--n2-rgb),0.45);
   border:1px solid rgba(255,255,255,0.12);
   box-shadow:0 8px 24px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.14);
 }
-.field input[type="text"],.field input[type="password"],.field select,.field-check{
+.field input[type="text"],.field input[type="password"],.field input[type="number"],.field input[type="search"],.field input[type="tel"],.field input[type="email"],.field select,.field-check{
   background:rgba(255,255,255,0.05);
   border:1px solid rgba(255,255,255,0.14);
   box-shadow:0 4px 14px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.10);
@@ -4476,19 +4947,19 @@ document.addEventListener('visibilitychange', function(){
   box-shadow:0 6px 18px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.16);
 }
 .menu-dropdown,.login-card,.ios-sheet{
-  background:linear-gradient(145deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03)),rgba(6,16,40,0.72);
+  background:linear-gradient(145deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03)),rgba(var(--n1-rgb),0.72);
   -webkit-backdrop-filter:blur(10px) saturate(1.3);backdrop-filter:blur(10px) saturate(1.3);
   border:1px solid rgba(255,255,255,0.15);
   box-shadow:0 18px 44px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.2);
 }
 /* Navegadores sin backdrop-filter: fondo casi sólido para que se lea bien */
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  .panel,.menu-dropdown,.login-card,.ios-sheet{background:rgba(4,12,35,0.95);}
+  .panel,.menu-dropdown,.login-card,.ios-sheet{background:rgba(var(--n1-rgb),0.95);}
 }
 /* Sin blur si la pestaña está oculta o el usuario pide menos movimiento */
 .tab-hidden .panel{-webkit-backdrop-filter:none;backdrop-filter:none;}
 @media (prefers-reduced-motion:reduce){
-  .panel,.menu-dropdown,.login-card,.ios-sheet{-webkit-backdrop-filter:none;backdrop-filter:none;background-color:rgba(4,12,35,0.9);}
+  .panel,.menu-dropdown,.login-card,.ios-sheet{-webkit-backdrop-filter:none;backdrop-filter:none;background-color:rgba(var(--n1-rgb),0.9);}
 }
 </style>
 <style id="animaciones">
@@ -4497,7 +4968,7 @@ document.addEventListener('visibilitychange', function(){
    Con "backwards" cada elemento vuelve a su estilo normal al terminar, así no
    se pisan los :hover ni las animaciones que ya tenían. */
 :root{--fx-ease:cubic-bezier(0.22,1,0.36,1);--fx-spring:cubic-bezier(0.34,1.56,0.64,1);}
-html{scroll-behavior:smooth;}
+html{scroll-behavior:auto;}
 @keyframes fxScreenIn{from{opacity:0;transform:translate3d(0,16px,0) scale(.985);}to{opacity:1;transform:none;}}
 @keyframes fxItemIn{from{opacity:0;transform:translate3d(0,18px,0) scale(.98);}to{opacity:1;transform:none;}}
 @keyframes fxRowIn{from{opacity:0;transform:translate3d(-16px,0,0);}to{opacity:1;transform:none;}}
@@ -4571,10 +5042,11 @@ html{scroll-behavior:smooth;}
 .fx-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);pointer-events:none;transform:scale(0);animation:fxRipple .65s ease-out forwards;z-index:1;}
 
 /* Transiciones suaves en controles y tarjetas */
-.field input,.field select,.field-check,.combo-card,.hud-card,.btn-ghost{
+.field select{transition:box-shadow .25s ease,border-color .25s ease,background-color .25s ease;}
+.field input,.field-check,.combo-card,.hud-card,.btn-ghost{
   transition:transform .3s var(--fx-ease),box-shadow .3s var(--fx-ease),border-color .3s ease,background-color .3s ease;
 }
-.field input:focus,.field select:focus{transform:translateY(-1px);}
+.field input:focus{transform:translateY(-1px);}
 .field-check:active,.btn-ghost:active{transform:scale(.97);}
 .combo-card:hover,.hud-card:hover{transform:translateY(-4px);}
 
@@ -4617,6 +5089,77 @@ document.addEventListener("pointerdown", function(e){
   b.appendChild(o);
   setTimeout(function(){ o.remove(); }, 700);
 }, {passive:true});
+</script>
+<style id="cristal-mejoras">
+/* ── Campos numéricos (General / Punto Rojo / Botón): sin flechitas blancas del navegador ── */
+.field input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
+.field input[type="number"]::-webkit-inner-spin-button,.field input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+.field input,.field select{color-scheme:dark;}
+
+/* ── GENERADOR: cristal más transparente y nítido (solo esta pantalla) ──
+   Fondo casi claro, blur suave con saturación alta, bordes y brillos especulares. */
+#generator .panel{
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.17) 0%,rgba(255,255,255,.05) 34%,rgba(255,255,255,.02) 60%,rgba(255,255,255,.11) 100%),
+    rgba(var(--n1-rgb),.30);
+  -webkit-backdrop-filter:blur(5px) saturate(1.9) brightness(1.1);
+  backdrop-filter:blur(5px) saturate(1.9) brightness(1.1);
+  border:1px solid rgba(255,255,255,.30);
+  box-shadow:0 26px 60px rgba(0,0,0,.36),0 8px 24px rgba(var(--d-rgb),.30),
+    inset 0 1px 0 rgba(255,255,255,.60),inset 0 -1px 0 rgba(255,255,255,.12),
+    inset 1px 0 0 rgba(255,255,255,.20),inset 0 0 38px rgba(255,255,255,.06);
+  padding-bottom:76px; /* espacio para que Wolfra no tape nada */
+}
+#generator .panel::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;
+  background:linear-gradient(118deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.07) 16%,transparent 34%),
+             radial-gradient(120% 60% at 85% 0%,rgba(var(--a-rgb),.14),transparent 60%);
+}
+
+/* ── WOLFRA: más grande, con brillo y completamente dentro de la pantalla ── */
+#generator{padding-bottom:210px;}
+#generator .panel-mascota{
+  position:absolute;right:0;bottom:-190px;width:clamp(150px,44vw,190px);max-width:none;
+  z-index:3;pointer-events:none;
+  filter:drop-shadow(0 14px 22px rgba(0,0,0,.55)) drop-shadow(0 0 22px rgba(var(--a-rgb),.55));
+}
+@media(max-width:380px){
+  #generator{padding-bottom:160px;}
+  #generator .panel-mascota{width:136px;bottom:-130px;}
+}
+
+/* ── MODO CALMADO: mientras un selector o campo está abierto se pausa el fondo animado
+   y el blur del panel, para que la lista de marcas abra al instante. ── */
+.fx-calm .orb,.fx-calm .panel::before,.fx-calm .btn::before{animation-play-state:paused !important;}
+.fx-calm .panel{-webkit-backdrop-filter:none !important;backdrop-filter:none !important;background-color:rgba(var(--n1-rgb),.62);}
+.fx-calm #generator .panel{background-color:rgba(var(--n1-rgb),.50);}
+</style>
+<script id="mejoras-js">
+(function(){
+  var h = document.documentElement, t = null;
+  function calmOn(){
+    clearTimeout(t);
+    if(h.classList.contains("fx-calm")) return;
+    h.classList.add("fx-calm");
+    if(typeof _fxRAF !== "undefined" && _fxRAF){ cancelAnimationFrame(_fxRAF); _fxRAF = null; }
+  }
+  function calmOff(){
+    clearTimeout(t);
+    t = setTimeout(function(){
+      h.classList.remove("fx-calm");
+      if(typeof _fxRAF !== "undefined" && !_fxRAF && !document.hidden && typeof _fxKind !== "undefined" && _fxKind !== "orbes" && _fxCanvas){ _fxFrame(); }
+    }, 300);
+  }
+  function esCampo(n){ return n && n.tagName && (n.tagName === "SELECT" || n.tagName === "INPUT"); }
+  document.addEventListener("focusin",  function(e){ if(esCampo(e.target)) calmOn(); });
+  document.addEventListener("focusout", function(e){ if(esCampo(e.target)) calmOff(); });
+  // Lista de modelos del calibrador DPI: un solo listener (delegación) en vez de cientos de onclick
+  var lista = document.getElementById("dpiListaModelos");
+  if(lista) lista.addEventListener("click", function(e){
+    var it = e.target.closest(".dpi-lista-item");
+    if(it && typeof _dpiSeleccionar === "function") _dpiSeleccionar(_dpiListaActual[+it.dataset.i]);
+  });
+})();
 </script>
 </body>
 </html>
